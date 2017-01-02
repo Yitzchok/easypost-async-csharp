@@ -111,6 +111,7 @@ namespace EasyPostTest {
             ((Dictionary<string, object>)parameters["options"])["label_date"] = tomorrow;
             Shipment shipment = Shipment.Create(parameters);
 
+            shipment.options.label_date = shipment.options.label_date.Value.ToLocalTime();
             Assert.AreEqual(((DateTime)shipment.options.label_date).ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow);
         }
 
@@ -124,6 +125,7 @@ namespace EasyPostTest {
             };
             shipment.Create();
 
+            shipment.options.label_date = shipment.options.label_date.Value.ToLocalTime();
             Assert.AreEqual(((DateTime)shipment.options.label_date).ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
 
