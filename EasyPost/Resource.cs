@@ -1,79 +1,71 @@
-﻿using Newtonsoft.Json;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 
-namespace EasyPost {
-    public class Resource : IResource {
-        public static T Load<T>(string json) where T : Resource {
-            return JsonConvert.DeserializeObject<T>(json);
+namespace EasyPost
+{
+    public class Resource : IResource
+    {
+        /// <summary>
+        /// Returns the resource as a dictionary of JSON style named parameters
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<string, object> AsDictionary()
+        {
+            return GetType()
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .ToDictionary(info => ToJsonStyle(info.Name), GetValue);
         }
 
-        public static T LoadFromDictionary<T>(Dictionary<string, object> attributes) where T : Resource {
-            Type type = typeof(T);
-            T resource = (T)Activator.CreateInstance(type);
-
-            object attribute;
-            foreach (PropertyInfo property in type.GetProperties()) {
-                if (attributes.TryGetValue(property.Name, out attribute) == false)
-                    continue;
-
-                if (property.PropertyType.GetInterfaces().Contains(typeof(IResource))) {
-                    MethodInfo method = property.PropertyType
-                                                .GetMethod("LoadFromDictionary", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public)
-                                                .MakeGenericMethod(new Type[] { property.PropertyType });
-
-                    property.SetValue(resource, method.Invoke(resource, new object[] { attribute }), null);
-                } else if (typeof(IEnumerable<IResource>).IsAssignableFrom(property.PropertyType)) {
-                    property.SetValue(resource, Activator.CreateInstance(property.PropertyType), null);
-
-                    Type genericType = property.PropertyType.GetGenericArguments()[0];
-                    MethodInfo method = genericType.GetMethod("LoadFromDictionary", BindingFlags.FlattenHierarchy | BindingFlags.Static | BindingFlags.Public)
-                                                   .MakeGenericMethod(new Type[] { genericType });
-
-                    foreach (Dictionary<string, object> attr in (List<Dictionary<string, object>>)attribute) {
-                        ((IList)property.GetValue(resource, null)).Add(method.Invoke(resource, new object[] { attr }));
+        /// <summary>
+        /// Converts a name from the usual C# style CamelCase to the JSON style camel_case
+        /// </summary>
+        /// <param name="name">Name to convert</param>
+        /// <returns>Converted name</returns>
+        private static string ToJsonStyle(
+            string name)
+        {
+            var sb = new StringBuilder();
+            var wasLower = false;
+            foreach (var c in name) {
+                if (char.IsUpper(c)) {
+                    if (wasLower) {
+                        sb.Append('_');
                     }
+                    wasLower = false;
+                } else {
+                    wasLower = true;
                 }
-                else {
-                    property.SetValue(resource, attribute, null);
-                }
+                sb.Append(char.ToLowerInvariant(c));
             }
-
-            return resource;
+            return sb.ToString();
         }
 
-        public void Merge(object source) {
-            foreach (PropertyInfo property in source.GetType().GetProperties()) {
-                property.SetValue(this, property.GetValue(source, null), null);
-            }
-        }
-
-        public Dictionary<string, object> AsDictionary() {
-            return this.GetType()
-                       .GetProperties(BindingFlags.DeclaredOnly | BindingFlags.Public | BindingFlags.Instance)
-                       .ToDictionary(info => info.Name, info => GetValue(info));
-        }
-
-        private object GetValue(PropertyInfo info) {
-            object value = info.GetValue(this, null);
+        /// <summary>
+        /// Gets the value for the property. If the propery is a reference to another resources we 
+        /// recurse into that resource and dump it as well as a dictionary.
+        /// </summary>
+        /// <param name="info">Property info for the property</param>
+        /// <returns>Value for the property</returns>
+        private object GetValue(
+            PropertyInfo info)
+        {
+            var value = info.GetValue(this, null);
 
             if (value is IResource) {
                 return ((IResource)value).AsDictionary();
-            }
-            else if (value is IEnumerable<IResource>) {
-                List<Dictionary<string, object>> values = new List<Dictionary<string, object>>();
-
-                foreach (IResource IResource in (IEnumerable<IResource>)value) {
-                    values.Add(IResource.AsDictionary());
-                }
-
-                return values;
-            }
-            else {
+            } else if (value is IEnumerable<IResource>) {
+                return ((IEnumerable<IResource>)value).Select(resource => resource.AsDictionary()).ToList();
+            } else {
                 return value;
             }
         }

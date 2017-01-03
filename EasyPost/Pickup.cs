@@ -1,100 +1,152 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
 using System;
 using System.Collections.Generic;
+using RestSharp;
 
-namespace EasyPost {
-    public class Pickup : Resource {
-        public string id { get; set; }
-        public string mode { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string status { get; set; }
-        public string name { get; set; }
-        public string reference { get; set; }
-        public DateTime min_datetime { get; set; }
-        public DateTime max_datetime { get; set; }
-        public bool is_account_address { get; set; }
-        public string instructions { get; set; }
-        public List<string> messages { get; set; }
-        public string confirmation { get; set; }
-        public Address address { get; set; }
-        public List<CarrierAccount> carrier_accounts { get; set; }
-        public List<Rate> pickup_rates { get; set; }
+namespace EasyPost
+{
+    public class Pickup : EasyPostObject
+    {
+        /// <summary>
+        /// One of: "unknown", "scheduled", or "canceled"
+        /// </summary>
+        public string Status { get; set; }
 
+        /// <summary>
+        /// Name of the pickup
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// The earliest time at which the package is available to pick up
+        /// </summary>
+        public DateTime MinDatetime { get; set; }
+
+        /// <summary>
+        /// The latest time at which the package is available to pick up. Must be later than the min_datetime
+        /// </summary>
+        public DateTime MaxDatetime { get; set; }
+
+        /// <summary>
+        /// Is the pickup address the account's address?
+        /// </summary>
+        public bool IsAccountAddress { get; set; }
+
+        /// <summary>
+        /// Additional text to help the driver successfully obtain the package
+        /// </summary>
+        public string Instructions { get; set; }
+
+        /// <summary>
+        /// A list of messages containing carrier errors encountered during pickup rate generation
+        /// </summary>
+        public List<string> Messages { get; set; }
+
+        /// <summary>
+        /// The confirmation number for a booked pickup from the carrier
+        /// </summary>
+        public string Confirmation { get; set; }
+
+        /// <summary>
+        /// The associated Shipment
+        /// </summary>
+        public Shipment Shipment { get; set; }
+
+        /// <summary>
+        /// The associated Address
+        /// </summary>
+        public Address Address { get; set; }
+
+        /// <summary>
+        /// The list of carriers (if empty, all carriers were used) used to generate pickup rates
+        /// </summary>
+        public List<CarrierAccount> CarrierAccounts { get; set; }
+
+        /// <summary>
+        /// The list of different pickup rates across valid carrier accounts for the shipment
+        /// </summary>
+        public List<CarrierRate> PickupRates { get; set; }
+    }
+
+    /// <summary>
+    /// Pickup API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve a Pickup from its id.
         /// </summary>
         /// <param name="id">String representing a Pickup. Starts with "pickup_".</param>
-        /// <returns>EasyPost.Pickup instance.</returns>
-        public static Pickup Retrieve(string id) {
-            Request request = new Request("pickups/{id}");
+        /// <returns>Pickup instance.</returns>
+        public Pickup GetPickup(
+            string id)
+        {
+            var request = new EasyPostRequest("pickups/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Pickup>();
+            return Execute<Pickup>(request);
         }
+
         /// <summary>
         /// Create a Pickup.
         /// </summary>
-        /// <param name="parameters">
-        /// Optional dictionary containing parameters to create the batch with. Valid pairs:
-        ///   * {"is_account_address", bool}
-        ///   * {"min_datetime", DateTime}
-        ///   * {"max_datetime", DateTime}
-        ///   * {"reference", string}
-        ///   * {"instructions", string}
-        ///   * {"carrier_accounts", List<CarrierAccount>}
-        ///   * {"address", Address}
-        ///   * {"shipment", Shipment}
-        ///   * {"batch", Batch}
-        /// All invalid keys will be ignored.
-        /// </param>
-        /// <returns>EasyPost.Pickup instance.</returns>
-        public static Pickup Create(Dictionary<string, object> parameters = null) {
-            return sendCreate(parameters ?? new Dictionary<string, object>());
-        }
-
-        /// <summary>
-        /// Create this Pickup.
-        /// </summary>
-        /// <exception cref="ResourceAlreadyCreated">Pickup already has an id.</exception>
-        public void Create() {
-            if (id != null)
+        /// <param name="pickup">Pickup to create</param>
+        /// <returns>Pickup instance.</returns>
+        public Pickup CreatePickup(
+            Pickup pickup = null)
+        {
+            if (pickup?.Id != null) {
                 throw new ResourceAlreadyCreated();
-            Merge(sendCreate(this.AsDictionary()));
-        }
+            }
+            var request = new EasyPostRequest("pickups", Method.POST);
+            if (pickup != null) {
+                request.AddBody(pickup.AsDictionary(), "pickup");
+            }
 
-        private static Pickup sendCreate(Dictionary<string, object> parameters) {
-            Request request = new Request("pickups", Method.POST);
-            request.AddBody(parameters, "pickup");
-
-            return request.Execute<Pickup>();
+            return Execute<Pickup>(request);
         }
 
         /// <summary>
         /// Purchase this pickup.
         /// </summary>
+        /// <param name="id">Pickup id to purchase</param>
         /// <param name="carrier">The name of the carrier to purchase with.</param>
         /// <param name="service">The name of the service to purchase.</param>
-        public void Buy(string carrier, string service) {
-            Request request = new Request("pickups/{id}/buy", Method.POST);
+        /// <returns>Pickup instance.</returns>
+        public Pickup BuyPickup(
+            string id,
+            string carrier,
+            string service)
+        {
+            var request = new EasyPostRequest("pickups/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);
-            request.AddBody(new List<Tuple<string, string>>() {
-                new Tuple<string, string>("carrier", carrier),
-                new Tuple<string, string>("service", service)
+            request.AddBody(new List<KeyValuePair<string, string>>() {
+                new KeyValuePair<string, string>("carrier", carrier),
+                new KeyValuePair<string, string>("service", service)
             });
 
-            Merge(request.Execute<Pickup>());
+            return Execute<Pickup>(request);
         }
 
         /// <summary>
         /// Cancel this pickup.
         /// </summary>
-        public void Cancel() {
-            Request request = new Request("pickups/{id}/cancel", Method.POST);
+        /// <param name="id">Pickup id to cancel</param>
+        /// <returns>Pickup instance.</returns>
+        public Pickup CancelPickp(
+            string id)
+        {
+            var request = new EasyPostRequest("pickups/{id}/cancel", Method.POST);
             request.AddUrlSegment("id", id);
 
-            Merge(request.Execute<Pickup>());
+            return Execute<Pickup>(request);
         }
     }
 }

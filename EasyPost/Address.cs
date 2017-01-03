@@ -1,169 +1,171 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using RestSharp;
 
-namespace EasyPost {
-    public class Address : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string name { get; set; }
-        public string company { get; set; }
-        public string street1 { get; set; }
-        public string street2 { get; set; }
-        public string city { get; set; }
-        public string state { get; set; }
-        public string zip { get; set; }
-        public string country { get; set; }
-        public string phone { get; set; }
-        public string email { get; set; }
-        public bool? residential { get; set; }
-        public string federal_tax_id { get; set; }
-        public string state_tax_id { get; set; }
-        public List<string> verify { get; set; }
-        public List<string> verify_strict { get; set; }
-        public string mode { get; set; }
-        public string error { get; set; }
-        public string message { get; set; }
-        public Verifications verifications { get; set; }
+namespace EasyPost
+{
+    /// <summary>
+    /// EasyPost Address objects are used to represent people, places, and organizations in a number of contexts.
+    /// </summary>
+    public class Address : EasyPostObject
+    {
+        /// <summary>
+        /// First line of the address
+        /// </summary>
+        public string Street1 { get; set; }
 
+        /// <summary>
+        /// Second line of the address
+        /// </summary>
+        public string Street2 { get; set; }
+
+        /// <summary>
+        /// City the address is located in
+        /// </summary>
+        public string City { get; set; }
+
+        /// <summary>
+        /// State or province the address is located in
+        /// </summary>
+        public string State { get; set; }
+
+        /// <summary>
+        /// ZIP or postal code the address is located in
+        /// </summary>
+        public string Zip { get; set; }
+
+        /// <summary>
+        /// Two letter ISO 3166 country code for the country the address is located in
+        /// </summary>
+        public string Country { get; set; }
+
+        /// <summary>
+        /// Whether or not this address would be considered residential
+        /// </summary>
+        public bool? Residential { get; set; }
+
+        /// <summary>
+        /// The specific designation for the address (only relevant if the address is a carrier facility)
+        /// </summary>
+        public string CarrierFacility { get; set; }
+
+        /// <summary>
+        /// Name of the person. Both name and company can be included
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Name of the organization. Both name and company can be included
+        /// </summary>
+        public string Company { get; set; }
+
+        /// <summary>
+        /// Phone number to reach the person or organization
+        /// </summary>
+        public string Phone { get; set; }
+
+        /// <summary>
+        /// Email to reach the person or organization
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
+        /// Federal tax identifier of the person or organization
+        /// </summary>
+        public string FederalTaxId { get; set; }
+
+        /// <summary>
+        /// State tax identifier of the person or organization
+        /// </summary>
+        public string StateTaxId { get; set; }
+
+        /// <summary>
+        /// The result of any verifications requested
+        /// </summary>
+        public Verifications Verifications { get; set; }
+    }
+
+    /// <summary>
+    /// Address API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve an Address from its id.
         /// </summary>
         /// <param name="id">String representing an Address. Starts with "adr_".</param>
         /// <returns>EasyPost.Address instance.</returns>
-        public static Address Retrieve(string id) {
-            Request request = new Request("addresses/{id}");
+        public Address GetAddress(
+            string id)
+        {
+            var request = new EasyPostRequest("addresses/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Address>();
+            return Execute<Address>(request);
         }
 
         /// <summary>
-        /// Create an Address.
+        /// Create an Address with optional verifications.
         /// </summary>
-        /// <param name="parameters">
-        /// Optional dictionary containing parameters to create the address with. Valid pairs:
-        ///   * {"name", string}
-        ///   * {"company", string}
-        ///   * {"stree1", string}
-        ///   * {"street2", string}
-        ///   * {"city", string}
-        ///   * {"state", string}
-        ///   * {"zip", string}
-        ///   * {"country", string}
-        ///   * {"phone", string}
-        ///   * {"email", string}
-        /// All invalid keys will be ignored.
+        /// <param name="address">Address to create</param>
+        /// <param name="verify">Verification flags to to control verification. You can verify the delivery address or the 
+        /// extended zip4 value. If you use the strict versions an HttpException to be raised if unsucessful. 
         /// </param>
-        /// <param name="verifications">
-        /// A list of verifications to perform on the address.
-        /// Possible items are "delivery" and "zip4".
-        /// </param>
-        /// <param name="strict_verifications">
-        /// A list of verifications to perform on the address.
-        /// Will cause an HttpException to be raised if unsucessful.
-        /// Possible items are "delivery" and "zip4".
-        /// </param>
-        /// <returns>EasyPost.Address instance.</returns>
-        public static Address Create(Dictionary<string, object> parameters = null) {
-            List<string> verifications = null, strictVerifications = null;
-            parameters = parameters ?? new Dictionary<string, object>();
-
-            if (parameters.ContainsKey("verifications")) {
-                verifications = (List<string>)parameters["verifications"];
-                parameters.Remove("verifications");
-            }
-
-            if (parameters.ContainsKey("strict_verifications")) {
-                strictVerifications = (List<string>)parameters["strict_verifications"];
-                parameters.Remove("strict_verifications");
-            }
-
-            return sendCreate(parameters, verifications, strictVerifications);
-        }
-
-        /// <summary>
-        /// Create this Address.
-        /// </summary>
-        /// <exception cref="ResourceAlreadyCreated">Address already has an id.</exception>
-        public void Create() {
-            Create(verify, verify_strict);
-        }
-
-        /// <summary>
-        /// Create this Address.
-        /// </summary>
-        /// <param name="verifications">
-        /// A list of verifications to perform on the address.
-        /// Possible items are "delivery" and "zip4".
-        /// </param>
-        /// <param name="strict_verifications">
-        /// A list of verifications to perform on the address.
-        /// Will cause an HttpException to be raised if unsucessful.
-        /// Possible items are "delivery" and "zip4".
-        /// </param>
-        /// <exception cref="ResourceAlreadyCreated">Address already has an id.</exception>
-        public void Create(List<string> verifications = null, List<string> strictVerifications = null) {
-            if (id != null)
+        /// <returns>Address instance.</returns>
+        public Address CreateAddress(
+            Address address,
+            VerificationFlags verify = VerificationFlags.None)
+        {
+            if (address.Id != null) {
                 throw new ResourceAlreadyCreated();
-            Merge(sendCreate(this.AsDictionary(), verifications, strictVerifications));
-        }
-
-        private static Address sendCreate(Dictionary<string, object> parameters, List<string> verifications = null, List<string> strictVerifications = null) {
-            Request request = new Request("addresses", Method.POST);
-            request.AddBody(parameters, "address");
-
-            foreach (string verification in verifications ?? new List<string>()) {
-                request.AddParameter("verify[]", verification, ParameterType.QueryString);
             }
 
-            foreach (string verification in strictVerifications ?? new List<string>()) {
-                request.AddParameter("verify_strict[]", verification, ParameterType.QueryString);
+            var request = new EasyPostRequest("addresses", Method.POST);
+            request.AddBody(address.AsDictionary(), "address");
+
+            if ((verify & VerificationFlags.Delivery) != 0) {
+                request.AddParameter("verify[]", "delivery", ParameterType.QueryString);
+            }
+            if ((verify & VerificationFlags.Zip4) != 0) {
+                request.AddParameter("verify[]", "zip4", ParameterType.QueryString);
+            }
+            if ((verify & VerificationFlags.DeliveryStrict) != 0) {
+                request.AddParameter("verify_strict[]", "delivery", ParameterType.QueryString);
+            }
+            if ((verify & VerificationFlags.Zip4Strict) != 0) {
+                request.AddParameter("verify_strict[]", "zip4", ParameterType.QueryString);
             }
 
-            return request.Execute<Address>();
+            return Execute<Address>(request);
         }
 
         /// <summary>
         /// Verify an address.
         /// </summary>
-        /// <returns>EasyPost.Address instance. Check message for verification failures.</returns>
-        public void Verify(string carrier = null) {
-            if (id == null)
-                Create();
+        /// <returns>Address instance. Check message for verification failures.</returns>
+        public Address VerifyAddress(
+            Address address,
+            string carrier = null)
+        {
+            if (address.Id == null) {
+                address = CreateAddress(address);
+            }
 
-            Request request = new Request("addresses/{id}/verify");
+            var request = new EasyPostRequest("addresses/{id}/verify");
             request.RootElement = "address";
-            request.AddUrlSegment("id", id);
+            request.AddUrlSegment("id", address.Id);
 
-            if (carrier != null)
+            if (carrier != null) {
                 request.AddParameter("carrier", carrier, ParameterType.QueryString);
+            }
 
-            Merge(request.Execute<Address>());
-        }
-
-        /// <summary>
-        /// Create and verify an Address.
-        /// </summary>
-        /// <param name="parameters">
-        /// Optional dictionary containing parameters to create the address with. Valid pairs:
-        ///   * {"name", string}
-        ///   * {"company", string}
-        ///   * {"stree1", string}
-        ///   * {"street2", string}
-        ///   * {"city", string}
-        ///   * {"state", string}
-        ///   * {"zip", string}
-        ///   * {"country", string}
-        ///   * {"phone", string}
-        ///   * {"email", string}
-        /// All invalid keys will be ignored.
-        /// </param>
-        public static Address CreateAndVerify(Dictionary<string, object> parameters = null) {
-            parameters["strict_verifications"] = new List<string>() { "delivery" };
-            return Address.Create(parameters);
+            return Execute<Address>(request);
         }
     }
 }

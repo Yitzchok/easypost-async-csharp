@@ -1,38 +1,106 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
 using System;
 
-namespace EasyPost {
-    public class Rate : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string mode { get; set; }
-        public string service { get; set; }
-        public string rate { get; set; }
-        public string list_rate { get; set; }
-        public string retail_rate { get; set; }
-        public string currency { get; set; }
-        public string list_currency { get; set; }
-        public string retail_currency { get; set; }
-        public int est_delivery_days { get; set; }
-        public DateTime delivery_date {get; set; } 
-        public bool delivery_date_guaranteed {get; set;}
-        public int delivery_days {get; set;}
-        public string carrier { get; set; }
-        public string shipment_id { get; set; }
-        public string carrier_account_id { get; set; }
+namespace EasyPost
+{
+    public class CarrierRate : EasyPostObject
+    {
+        /// <summary>
+        /// Service level/name. See here for details:
+        /// https://www.easypost.com/docs/api#service-levels
+        /// </summary>
+        public string Service { get; set; }
 
+        /// <summary>
+        /// Name of carrier
+        /// </summary>
+        public string Carrier { get; set; }
+
+        /// <summary>
+        /// ID of the CarrierAccount record used to generate this rate
+        /// </summary>
+        public string CarrierAccountId { get; set; }
+
+        /// <summary>
+        /// ID of the Shipment this rate belongs to
+        /// </summary>
+        public string ShipmentId { get; set; }
+
+        /// <summary>
+        /// The actual rate quote for this service
+        /// </summary>
+        public double Rate { get; set; }
+
+        /// <summary>
+        /// Currency for the rate
+        /// </summary>
+        public string Currency { get; set; }
+
+        /// <summary>
+        /// The retail rate is the in-store rate given with no account
+        /// </summary>
+        public double RetailRate { get; set; }
+
+        /// <summary>
+        /// Currency for the retail rate
+        /// </summary>
+        public string RetailCurrency { get; set; }
+
+        /// <summary>
+        /// The list rate is the non-negotiated rate given for having an account with the carrier
+        /// </summary>
+        public double ListRate { get; set; }
+
+        /// <summary>
+        /// Currency for the list rate
+        /// </summary>
+        public string ListCurrency { get; set; }
+
+        /// <summary>
+        /// delivery days for this service
+        /// </summary>
+        public int DeliveryDays { get; set; }
+
+        /// <summary>
+        /// date for delivery
+        /// </summary>
+        public DateTime DeliveryDate { get; set; }
+
+        /// <summary>
+        /// indicates if delivery window is guaranteed (true) or not (false)
+        /// </summary>
+        public bool DeliveryDateGuaranteed { get; set; }
+
+        /// <summary>
+        /// *This field is deprecated and should be ignored.
+        /// </summary>
+        public int EstDeliveryDays { get; set; }
+    }
+
+    /// <summary>
+    /// Rate API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve a Rate from its id.
         /// </summary>
         /// <param name="id">String representing a Rate. Starts with "rate_".</param>
-        /// <returns>EasyPost.Rate instance.</returns>
-        public static Rate Retrieve(string id) {
-            Request request = new Request("rates/{id}");
+        /// <returns>CarrierRate instance.</returns>
+        public CarrierRate GetRate(
+            string id)
+        {
+            var request = new EasyPostRequest("rates/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Rate>();
+            return Execute<CarrierRate>(request);
         }
     }
 }

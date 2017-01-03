@@ -1,6 +1,6 @@
-# EasyPost .Net Client Library
+# EasyPost Async .Net Client Library
 
-EasyPost is a simple shipping API. You can sign up for an account at https://easypost.com
+EasyPost Async is a simple shipping API using the .net 4.5 Task Async API. You can sign up for an account at https://easypost.com
 
 ## Documentation
 
@@ -8,37 +8,29 @@ Up-to-date documentation at: https://www.easypost.com/docs/api/csharp
 
 ## Installation
 
-The easiest way to add EasyPost to your project is with the NuGet package manager.
+The easiest way to add EasyPost Async to your project is with the NuGet package manager.
 
 ```
-Install-Package EasyPost-Official
+Install-Package EasyPost-Async
 ```
 
 See NuGet docs for instructions on installing via the [dialog](http://docs.nuget.org/docs/start-here/managing-nuget-packages-using-the-dialog) or the [console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console).
 
 ## Usage
 
-The EasyPost API consists of many object types. There are several attributes that are consistent across all objects:
+The EasyPost Async API consists of many object types. There are several attributes that are consistent across all objects:
 
-* `id` -- Guaranteed unique identifier of the object.
-* `created_at`/`updated_at`  -- Timestamps of creation and last update time.
+* `Id` -- Guaranteed unique identifier of the object.
+* `CreatedAt`/`UpdatedAt`  -- Timestamps of creation and last update time.
 
 ### Configuration
 
-If you are operating with a single EasyPost API key, during the initialization of your application add the following to configure EasyPost.
+The EasyPost Async API is initialized using your API key via the EasyPostClient class. The EasyPostClient class exposes all the functions of the API via a single IEasyPostClient interface that is fully mockable for unit testing.
 
 ```cs
 using EasyPost;
 
-ClientManager.SetCurrent("ApiKey");
-```
-
-If you are operating with multiple EasyPost API keys, or wish to delegate the construction of the client requests, configure the `ClientManager` with a delegate at application initialization.
-
-```cs
-using EasyPost;
-
-ClientManager.SetCurrent(() => new Client(new ClientConfiguration("yourApiKeyHere")));
+var client = new EasyPostClient("ApiKey");
 ```
 
 ### [Address Verification](https://www.easypost.com/docs/api/csharp#create-and-verify-addresses)
@@ -48,20 +40,19 @@ An `Address` can be verified using one or many verifications [methods](https://w
 ```cs
 using EasyPost;
 
-Address address = new Address() {
-    company = "Simpler Postage Inc",
-    street1 = "164 Townsend Street",
-    street2 = "Unit 1",
-    city = "San Francisco",
-    state = "CA",
-    country = "US",
-    zip = "94107",
-    verify = new List<string>() { "delivery" }
+var address = new Address {
+    Company = "Simpler Postage Inc",
+    Street1 = "164 Townsend Street",
+    Street2 = "Unit 1",
+    City = "San Francisco",
+    State = "CA",
+    Country = "US",
+    Zip = "94107",
 };
 
-Address address = address.Create();
+var address = client.CreateAddress(address, VerificationFlags.Delivery);
 
-if (address.verifications.delivery.success) {
+if (address.Verifications.Delivery.Success) {
     // successful verification
 } else {
     // unsuccessful verification
@@ -71,19 +62,18 @@ if (address.verifications.delivery.success) {
 ```cs
 using EasyPost;
 
-Address address = new Address() {
-    company = "Simpler Postage Inc",
-    street1 = "164 Townsend Street",
-    street2 = "Unit 1",
-    city = "San Francisco",
-    state = "CA",
-    country = "US",
-    zip = "94107",
-    verify_strict = new List<string>() { "delivery" }
+Address address = new Address {
+    C1ompany = "Simpler Postage Inc",
+    Street1 = "164 Townsend Street",
+    Street2 = "Unit 1",
+    City = "San Francisco",
+    State = "CA",
+    Country = "US",
+    Zip = "94107",
 };
 
 try {
-    address.Create();
+    var address = client.CreateAddress(address, VerificationFlags.DeliveryStrict);
 } except (HttpException) {
     // unsuccessful verification
 }
@@ -96,25 +86,25 @@ try {
 Rating is available through the `Shipment` object. Since we do not charge for rating there are rate limits for this action if you do not eventually purchase the `Shipment`. Please contact us at support@easypost.com if you have any questions.
 
 ```cs
-Address fromAddress = new Address() { zip = "14534" };
-Address toAddress = new Address() { zip = "94107" };
+var fromAddress = new Address { Zip = "14534" };
+var toAddress = new Address { Zip = "94107" };
 
-Parcel parcel = new Parcel() {
-    length = 8,
-    width = 6,
-    height = 5,
-    weight = 10
+var parcel = new Parcel {
+    Length = 8,
+    Width = 6,
+    Height = 5,
+    Weight = 10
 };
 
-Shipment shipment = new Shipment() {
-    from_address = fromAddress,
-    to_address = toAddress,
-    parcel = parcel
+var shipment = new Shipment {
+    FromAddress = fromAddress,
+    ToAddress = toAddress,
+    Parcel = parcel
 };
 
-shipment.Create();
+shipment = client.CreateShipment(shipment);
 
-foreach (Rate rate in shipment.rates) {
+foreach (var rate in shipment.Rates) {
     // process rates
 }
 ```
@@ -124,49 +114,49 @@ foreach (Rate rate in shipment.rates) {
 Purchasing a shipment will generate a `PostageLabel` and any customs `Form`s that are needed for shipping.
 
 ```cs
-Address fromAddress = new Address() { id = "adr_..." };
-Address toAddress = new Address() {
-    company = "EasyPost",
-    street1 = "164 Townsend Street",
-    street2 = "Unit 1",
-    city = "San Francisco",
-    state = "CA",
-    country = "US",
-    zip = "94107"
+var fromAddress = new Address { Id = "adr_..." };
+var toAddress = new Address {
+    Company = "EasyPost",
+    Street1 = "164 Townsend Street",
+    Street2 = "Unit 1",
+    City = "San Francisco",
+    State = "CA",
+    Country = "US",
+    Zip = "94107"
 };
 
-Parcel parcel = new Parcel() {
-    length = 8,
-    width = 6,
-    height = 5,
-    weight = 10
+var parcel = new Parcel {
+    Length = 8,
+    Width = 6,
+    Height = 5,
+    Weight = 10
 };
 
-CustomsItem item = new CustomsItem() { description = "description" };
-CustomsInfo info = new CustomsInfo() {
-    customs_certify = "TRUE",
-    eel_pfc = "NOEEI 30.37(a)",
-    customs_items = new List<CustomsItem>() { item }
+var item = new CustomsItem { Description = "description" };
+var info = new CustomsInfo {
+    CustomsCertify = "TRUE",
+    EelPfc = "NOEEI 30.37(a)",
+    CustomsItems = new List<CustomsItem> { item }
 };
 
-Options options = new Options() { label_format = "PDF" };
+var options = new Options { Label_format = "PDF" };
 
-Shipment shipment = new Shipment() {
-    from_address = fromAddress,
-    to_address = toAddress,
-    parcel = parcel,
-    customs_info = info,
-    optoins = options
+var shipment = new Shipment {
+    FromAddress = fromAddress,
+    ToAddress = toAddress,
+    Parcel = parcel,
+    CustomsInfo = info,
+    Options = options
 };
 
-shipment.Buy(shipment.LowestRate(
-    includeServices: new List<Service>() { Service.Priority },
-    excludeCarriers: new List<Carrier>() { Carrier.USPS }
+shipment = client.BuyShipment(shipment.Id, shipment.LowestRate(
+    includeServices: new[] { Service.Priority },
+    excludeCarriers: new[] { Carrier.USPS }
 ));
 
-shipment.postage_label.url; // https://easypost-files.s3-us-west-2.amazonaws.com/files/postage_label/20160826/8e77c397d47b4d088f1c684b7acd802a.png
+shipment.PostageLabel.Url; // https://easypost-files.s3-us-west-2.amazonaws.com/files/postage_label/20160826/8e77c397d47b4d088f1c684b7acd802a.png
 
-foreach (Form form in shipment.forms) {
+foreach (var form in shipment.Forms) {
     // process forms
 }
 ```
@@ -178,29 +168,27 @@ The `Batch` object allows you to perform operations on multiple `Shipment`s at o
 ```cs
 using EasyPost;
 
-Shipment shipment = new Shipment() {
-    from_address = fromAddress,
-    to_address = toAddress,
-    parcel = parcel,
-    optoins = options
+var shipment = new Shipment {
+    FromAddress = fromAddress,
+    ToAddress = toAddress,
+    Parcel = parcel,
+    Options = options
 };
 
-Batch batch = Batch.CreateAndBuy(new Dictionary<string, object>() {
-    { "reference", "MyReference" },
-    { "shipments", new List<Dictionary<string, object>>() { shipment } }
-});
+var batch = client.CreateBatch(new[] { _testBatchShipment }, "MyReference");
 ```
 
-This will produce two webhooks. One `batch.created` and one `batch.updated`. Process each `Batch` [state](https://www.easypost.com/docs/api/csharp#batch-object) according to your business logic.
+This will produce two webhooks. One `batch.Created` and one `batch.Updated`. Process each `Batch` [state](https://www.easypost.com/docs/api/csharp#batch-object) according to your business logic.
 
 ```cs
 using EasyPost;
 
-Batch batch = Batch.Retrieve("batch_...");
-batch.GenerateLabel("zpl"); // populates batch.label_url asynchronously
+var batch = client.GetBatch(batch.Id);
+
+batch = _client.GenerateLabelForBatch(batch.Id, "zpl"); // populates batch.label_url asynchronously
 ```
 
-Consume the subsequent `batch.updated` webhook to process further.
+Consume the subsequent `batch.Updated` webhook to process further.
 
 ### Reporting Issues
 

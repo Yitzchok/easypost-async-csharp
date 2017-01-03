@@ -1,196 +1,116 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
+using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Generic;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class AddressTest {
-        Address address;
+    public class AddressTest
+    {
+        private EasyPostClient _client;
+        private Address _testAddress;
 
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
-            address = new Address() {
-                company = "Simpler Postage Inc",
-                street1 = "164 Townsend Street",
-                street2 = "Unit 1",
-                city = "San Francisco",
-                state = "CA",
-                country = "US",
-                zip = "94107"
+        public void Initialize()
+        {
+            _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
+            _testAddress = new Address {
+                Company = "Simpler Postage Inc",
+                Street1 = "164 Townsend Street",
+                Street2 = "Unit 1",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94107"
             };
         }
 
         [TestMethod]
         [ExpectedException(typeof(HttpException))]
-        public void TestRetrieveInvalidId() {
-            Address.Retrieve("not-an-id");
+        public void TestRetrieveInvalidId()
+        {
+            _client.GetAddress("not-an-id");
         }
 
         [TestMethod]
-        public void TestCreateAndRetrieve() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" }
-            };
-            Address address = Address.Create(parameters);
-            Assert.IsNotNull(address.id);
-            Assert.AreEqual(address.company, "Simpler Postage Inc");
-            Assert.IsNull(address.name);
+        public void TestCreateAndRetrieve()
+        {
+            var address = _client.CreateAddress(_testAddress);
+            Assert.IsNotNull(address.Id);
+            Assert.AreEqual(address.Company, "Simpler Postage Inc");
+            Assert.IsNull(address.Name);
 
-            Address retrieved = Address.Retrieve(address.id);
-            Assert.AreEqual(address.id, retrieved.id);
+            var retrieved = _client.GetAddress(address.Id);
+            Assert.AreEqual(address.Id, retrieved.Id);
         }
 
         [TestMethod]
-        public void TestCreateWithVerifications() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" },
-                { "verifications", new List<string>() { "delivery", "zip4" } }
-            };
+        public void TestCreateWithVerifications()
+        {
+            var address = _client.CreateAddress(_testAddress, VerificationFlags.Delivery | VerificationFlags.Zip4);
+            Assert.IsNotNull(address.Verifications.Delivery);
+            Assert.AreEqual(address.Verifications.Delivery.Success, true);
+            Assert.IsNotNull(address.Verifications.Zip4);
+            Assert.AreEqual(address.Verifications.Zip4.Success, true);
 
-            Address address = Address.Create(parameters);
-            Assert.IsNotNull(address.verifications.delivery);
-            Assert.IsNotNull(address.verifications.zip4);
-
-            parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "123 Fake Street" },
-                { "zip", "94107" },
-                { "verifications", new List<string>() { "delivery", "zip4" } }
-            };
-
-            address = Address.Create(parameters);
-            Assert.AreEqual(address.verifications.delivery.success, false);
-        }
-
-        [TestMethod]
-        public void TestInstanceCreateWithVerifications() {
-            Address address = new Address() {
-                company = "Simpler Postage Inc",
-                street1 = "164 Townsend Street",
-                street2 = "Unit 1",
-                city = "San Francisco",
-                state = "CA",
-                country = "US",
-                zip = "94107",
-                verify = new List<string>() { "delivery", "zip4" }
-            };
-
-            address.Create();
-            Assert.IsNotNull(address.verifications.delivery);
-            Assert.IsNotNull(address.verifications.zip4);
+            address = _client.CreateAddress(new Address {
+                    Company = "Simpler Postage Inc",
+                    Street1 = "123 Fake Street",
+                    Zip = "94107"
+                },
+                VerificationFlags.Delivery | VerificationFlags.Zip4);
+            Assert.AreEqual(address.Verifications.Delivery.Success, false);
+            Assert.AreEqual(address.Verifications.Zip4.Success, false);
         }
 
         [TestMethod]
         [ExpectedException(typeof(HttpException))]
-        public void TestCreateWithStrictVerifications() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "123 Fake Street" },
-                { "zip", "94107" },
-                { "strict_verifications", new List<string>() { "delivery", "zip4" } }
-            };
-
-            Address address = Address.Create(parameters);
+        public void TestCreateWithStrictVerifications()
+        {
+            _client.CreateAddress(new Address {
+                    Company = "Simpler Postage Inc",
+                    Street1 = "123 Fake Street",
+                    Zip = "94107"
+                },
+                VerificationFlags.DeliveryStrict | VerificationFlags.Zip4Strict);
         }
 
         [TestMethod]
-        public void TestCreateInstance() {
-            address.Create();
-            Assert.IsNotNull(address.id);
+        public void TestVerify()
+        {
+            var address = _client.CreateAddress(_testAddress);
+            address = _client.VerifyAddress(address);
+            Assert.IsNotNull(address.Id);
+            Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
+            Assert.AreEqual(address.Street1, "164 TOWNSEND ST UNIT 1");
+            Assert.IsNull(address.Name);
+            Assert.IsTrue((bool)address.Residential);
         }
 
         [TestMethod]
-        public void TestInstanceCreateWithVerificationParams() {
-            address.Create(new List<string>() { "delivery", "zip4" });
-            Assert.IsNotNull(address.verifications.delivery);
-            Assert.IsNotNull(address.verifications.zip4);
+        public void TestVerifyCarrier()
+        {
+            var address = _client.CreateAddress(_testAddress);
+            address = _client.VerifyAddress(address, "usps");
+            Assert.IsNotNull(address.Id);
+            Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
+            Assert.AreEqual(address.Street1, "164 TOWNSEND ST UNIT 1");
+            Assert.IsNull(address.Name);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpException))]
-        public void TestInstanceCreateWithStrictVerifications() {
-            address = new Address() {
-                company = "Simpler Postage Inc"
-            };
-            address.Create(strictVerifications: new List<string> { "delivery", "zip4" });
-        }
-
-        [TestMethod]
-        public void TestVerify() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" },
-                { "residential", true }
-            };
-            Address address = Address.Create(parameters);
-            address.Verify();
-            Assert.IsNotNull(address.id);
-            Assert.AreEqual(address.company, "SIMPLER POSTAGE INC");
-            Assert.IsNull(address.name);
-            Assert.IsTrue((bool)address.residential);
-        }
-
-        [TestMethod]
-        public void TestVerifyCarrier() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" },
-                { "residential", true }
-            };
-            Address address = Address.Create(parameters);
-            address.Verify("usps");
-            Assert.IsNotNull(address.id);
-            Assert.AreEqual(address.company, "SIMPLER POSTAGE INC");
-            Assert.AreEqual(address.street1, "164 TOWNSEND ST UNIT 1");
-            Assert.IsNull(address.name);
-        }
-
-        [TestMethod]
-        public void TestVerifyBeforeCreate() {
-            address.Verify();
-            Assert.IsNotNull(address.id);
-        }
-
-        [TestMethod]
-        public void TestCreateAndVerify() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" }
-            };
-            Address address = Address.CreateAndVerify(parameters);
-            Assert.IsNotNull(address.id);
-            Assert.AreEqual(address.company, "SIMPLER POSTAGE INC");
-            Assert.IsNull(address.name);
-            Assert.AreEqual(address.verifications.delivery.success, true);
+        public void TestVerifyBeforeCreate()
+        {
+            var address = _client.VerifyAddress(_testAddress);
+            Assert.IsNotNull(address.Id);
+            Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
         }
     }
 }

@@ -1,50 +1,75 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using RestSharp;
 
-namespace EasyPost {
-    public class Parcel : Resource {
-        public string id { get; set; }
-        public string mode { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public double? length { get; set; }
-        public double? width { get; set; }
-        public double? height { get; set; }
-        public double weight { get; set; }
-        public string predefined_package { get; set; }
+namespace EasyPost
+{
+    public class Parcel : EasyPostObject
+    {
+        /// <summary>
+        /// Required if predefined_package is empty
+        /// </summary>
+        public double? Length { get; set; }
 
+        /// <summary>
+        /// Required if predefined_package is empty
+        /// </summary>
+        public double? Width { get; set; }
+
+        /// <summary>
+        /// Required if predefined_package is empty
+        /// </summary>
+        public double? Height { get; set; }
+
+        /// <summary>
+        /// Always required
+        /// </summary>
+        public double Weight { get; set; }
+
+        /// <summary>
+        /// Optional, one of the pre defined packages defined here:
+        /// https://www.easypost.com/docs/api#predefined-packages
+        /// </summary>
+        public string PredefinedPackage { get; set; }
+    }
+
+    /// <summary>
+    /// Parcel API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve a Parcel from its id.
         /// </summary>
         /// <param name="id">String representing a Parcel. Starts with "prcl_".</param>
-        /// <returns>EasyPost.Parcel instance.</returns>
-        public static Parcel Retrieve(string id) {
-            Request request = new Request("parcels/{id}");
+        /// <returns>Parcel instance.</returns>
+        public Parcel GetParcel(
+            string id)
+        {
+            var request = new EasyPostRequest("parcels/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Parcel>();
+            return Execute<Parcel>(request);
         }
 
         /// <summary>
         /// Create a Parcel.
         /// </summary>
-        /// <param name="parameters">
-        /// Dictionary containing parameters to create the parcel with. Valid pairs:
-        ///   * {"length", int}
-        ///   * {"width", int}
-        ///   * {"height", int}
-        ///   * {"weight", double}
-        ///   * {"predefined_package", string}
-        /// All invalid keys will be ignored.
-        /// </param>
-        /// <returns>EasyPost.Parcel instance.</returns>
-        public static Parcel Create(Dictionary<string, object> parameters) {
-            Request request = new Request("parcels", Method.POST);
-            request.AddBody(parameters, "parcel");
+        /// <param name="parcel">Parcel to create</param>
+        /// <returns>Parcel instance.</returns>
+        public Parcel CreateParcel(
+            Parcel parcel)
+        {
+            var request = new EasyPostRequest("parcels", Method.POST);
+            request.AddBody(parcel.AsDictionary(), "parcel");
 
-            return request.Execute<Parcel>();
+            return Execute<Parcel>(request);
         }
     }
 }

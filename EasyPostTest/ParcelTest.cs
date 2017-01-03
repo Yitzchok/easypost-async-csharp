@@ -1,34 +1,49 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class ParcelTest {
+    public class ParcelTest
+    {
+        private EasyPostClient _client;
+
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
         }
 
         [TestMethod]
-        public void TestCreateAndRetrieve() {
-            Parcel parcel = Parcel.Create(new Dictionary<string, object>() {
-                {"length", 10}, {"width", 20}, {"height", 5}, {"weight", 1.8}
+        public void TestCreateAndRetrieve()
+        {
+            var parcel = _client.CreateParcel(new Parcel {
+                Length = 10,
+                Width = 20,
+                Height = 5,
+                Weight = 1.8,
             });
-            Parcel retrieved = Parcel.Retrieve(parcel.id);
-            Assert.AreEqual(parcel.id, retrieved.id);
+            var retrieved = _client.GetParcel(parcel.Id);
+            Assert.AreEqual(parcel.Id, retrieved.Id);
         }
 
         [TestMethod]
-        public void TestPredefinedPackage() {
-            Parcel parcel = new Parcel() { weight = 1.8, predefined_package = "SMALLFLATRATEBOX" };
-            Shipment shipment = new Shipment() { parcel = parcel };
-            shipment.Create();
+        public void TestPredefinedPackage()
+        {
+            var parcel = new Parcel { Weight = 1.8, PredefinedPackage = "SMALLFLATRATEBOX" };
+            var shipment = new Shipment { Parcel = parcel };
+            _client.CreateShipment(shipment);
 
-            Assert.AreEqual(null, shipment.parcel.height);
-            Assert.AreEqual("SMALLFLATRATEBOX", shipment.parcel.predefined_package);
+            Assert.AreEqual(null, shipment.Parcel.Height);
+            Assert.AreEqual("SMALLFLATRATEBOX", shipment.Parcel.PredefinedPackage);
         }
     }
 }

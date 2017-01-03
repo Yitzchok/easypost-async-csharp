@@ -8,16 +8,16 @@
 
 namespace EasyPost
 {
-    public class Error : Resource
+    public class VerificationDetails : Resource
     {
         /// <summary>
-        /// Field of the request that the error describes
+        /// The latitude of the address
         /// </summary>
-        public string Field { get; set; }
+        public double Latitude { get; set; }
 
         /// <summary>
-        /// Human readable description of the problem
+        /// The longitude of the address
         /// </summary>
-        public string Message { get; set; }
+        public double Longitude { get; set; }
     }
 }

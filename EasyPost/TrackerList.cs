@@ -1,22 +1,44 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
+
+using System.Collections.Generic;
 using System.Linq;
 
-namespace EasyPost {
-    public class TrackerList {
-        public List<Tracker> trackers { get; set; }
-        public bool has_more { get; set; }
-
-        public Dictionary<string, object> filters { get; set; }
+namespace EasyPost
+{
+    public class TrackerList
+    {
+        /// <summary>
+        /// List of trackers
+        /// </summary>
+        public List<Tracker> Trackers { get; set; }
 
         /// <summary>
-        /// Get the next page of shipments based on the original parameters passed to Shipment.List().
+        /// True if there is more in the list
         /// </summary>
-        /// <returns>A new EasyPost.ShipmentList instance.</returns>
-        public TrackerList Next() {
-            filters = filters ?? new Dictionary<string, object>();
-            filters["before_id"] = trackers.Last().id;
+        public bool HasMore { get; set; }
 
-            return Tracker.List(filters);
+        /// <summary>
+        /// Options used to generate the list
+        /// </summary>
+        public TrackerListOptions Options { get; set; }
+
+        /// <summary>
+        /// Get the next page of shipments based on the original parameters used to generate the list
+        /// </summary>
+        /// <param name="client">Easy post client to use</param>
+        /// <returns>A new ShipmentList instance.</returns>
+        public TrackerList Next(
+            IEasyPostClient client)
+        {
+            var options = Options ?? new TrackerListOptions();
+            options.BeforeId = Trackers.Last().Id;
+            return client.ListTrackers(options);
         }
     }
 }

@@ -5,8 +5,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("EasyPost")]
-[assembly: AssemblyDescription("EasyPost Shipping API Client Library for .NET https://easypost.com/docs")]
+[assembly: AssemblyTitle("EasyPost Async")]
+[assembly: AssemblyDescription("EasyPost Async Shipping API Client Library for .NET https://easypost.com/docs")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("EasyPost")]
 [assembly: AssemblyProduct("EasyPost")]
@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCulture("")]
 
 // Make "private" methods testable.
-[assembly: InternalsVisibleTo("EasyPostTest, PublicKey=0024000004800000940000000602000000240000525341310004000001000100fd0773e2410e7775bdb1dcdf4f18bde613db939e4687094c4e35da5c25e029fce5a0598f03ace975f005b002f1e56d42bc00e2c54aa41cc416da712620013b3a35ab016f1ad5382e4742cc725434129b0acb8c8f7c900609d2c65bf00998a9b0c8576299f0efa0d8d8b742b035cdcaf916ea12234fec67273bd4753677a3ccae")]
+[assembly: InternalsVisibleTo("EasyPostTest, PublicKey=0024000004800000940000000602000000240000525341310004000001000100052ab0a94a4a85999a646e4b6d0967a62d50071851debf47701ae3ef51da1e9d727d41dc3511356741ea37e3921f4c8d9158c0acc75000d8c0aa4a12a0ae8a61fc8c2af71b96aa6734e9f4ac638a26430fb58fa5c4f1f041cd592e49971998436deec6798ffa04d977f590f4a62f4497c4c5bcebee24ed9ef1862f619120ba8b")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("2.2.4.0")]
-[assembly: AssemblyInformationalVersion("2.2.4.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0.0")]

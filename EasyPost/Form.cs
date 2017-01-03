@@ -1,13 +1,28 @@
-﻿using System;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-namespace EasyPost {
-    public class Form : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string form_url { get; set; }
-        public string form_type { get; set; }
-        public string mode { get; set; }
-        public bool submitted_electronically { get; set; }
+namespace EasyPost
+{
+    public class Form : EasyPostObject
+    {
+        /// <summary>
+        /// Url of the form
+        /// </summary>
+        public string FormUrl { get; set; }
+
+        /// <summary>
+        /// Type of the form
+        /// </summary>
+        public string FormType { get; set; }
+
+        /// <summary>
+        /// True if submitted electronically
+        /// </summary>
+        public bool SubmittedElectronically { get; set; }
     }
 }

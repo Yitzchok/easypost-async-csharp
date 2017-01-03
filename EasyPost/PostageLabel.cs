@@ -1,21 +1,27 @@
-﻿using System;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-namespace EasyPost {
-    public class PostageLabel : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public int date_advance { get; set; }
-        public string integrated_form { get; set; }
-        public DateTime label_date { get; set; }
-        public int label_resolution { get; set; }
-        public string label_size { get; set; }
-        public string label_type { get; set; }
-        public string label_url { get; set; }
-        public string label_file_type { get; set; }
-        public string label_pdf_url { get; set; }
-        public string label_epl2_url { get; set; }
-        public string label_zpl_url { get; set; }
-        public string mode { get; set; }
+using System;
+
+namespace EasyPost
+{
+    public class PostageLabel : EasyPostObject
+    {
+        public int DateAdvance { get; set; }
+        public string IntegratedForm { get; set; }
+        public DateTime LabelDate { get; set; }
+        public int LabelResolution { get; set; }
+        public string LabelSize { get; set; }
+        public string LabelType { get; set; }
+        public string LabelUrl { get; set; }
+        public string LabelFileType { get; set; }
+        public string LabelPdfUrl { get; set; }
+        public string LabelEpl2Url { get; set; }
+        public string LabelZplUrl { get; set; }
     }
 }

@@ -1,131 +1,151 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
+using EasyPost;
 using System.Linq;
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class BatchTest {
-        Dictionary<string, object> fromAddress;
-        Dictionary<string, object> toAddress;
-        Dictionary<string, object> shipmentParameters;
-        Dictionary<string, object> batchShipmentParameters;
+    public class BatchTest
+    {
+        private EasyPostClient _client;
+        private Shipment _testShipment;
+        private Shipment _testBatchShipment;
+        private Address _fromAddress;
+        private Address _toAddress;
 
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
 
-            fromAddress = new Dictionary<string, object>() {
-                { "name", "Andrew Tribone" },
-                { "street1", "480 Fell St" },
-                { "street2", "#3" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94102" }
+            _toAddress = new Address {
+                Company = "Simpler Postage Inc",
+                Street1 = "164 Townsend Street",
+                Street2 = "Unit 1",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94107",
             };
-            toAddress = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" }
+            _fromAddress = new Address {
+                Name = "Andrew Tribone",
+                Street1 = "480 Fell St",
+                Street2 = "#3",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94102",
             };
-            shipmentParameters = new Dictionary<string, object>() {
-                { "parcel", new Dictionary<string, object>() {
-                    { "length", 8 },
-                    { "width", 6 },
-                    { "height", 5 },
-                    { "weight", 10 }
-                } },
-                { "to_address", toAddress },
-                { "from_address", fromAddress }
+            _testShipment = new Shipment {
+                ToAddress = _toAddress,
+                FromAddress = _fromAddress,
+                Parcel = new Parcel {
+                    Length = 8,
+                    Width = 6,
+                    Height = 5,
+                    Weight = 10,
+                },
             };
-            batchShipmentParameters = new Dictionary<string, object>() {
-                { "parcel", new Dictionary<string, object>() {
-                    { "length", 8 },
-                    { "width", 6 },
-                    { "height", 5 },
-                    { "weight", 10 }
-                } },
-                { "to_address", toAddress },
-                { "from_address", fromAddress },
-                { "carrier", "USPS" },
-                { "service", "Priority" }
+            _testBatchShipment = new Shipment {
+                ToAddress = _toAddress,
+                FromAddress = _fromAddress,
+                Parcel = new Parcel {
+                    Length = 8,
+                    Width = 6,
+                    Height = 5,
+                    Weight = 10,
+                },
+                Carrier = "USPS",
+                Service = "Priority",
             };
         }
 
         [TestMethod]
-        public void TestRetrieve() {
-            Batch batch = Batch.Create();
-            Batch retrieved = Batch.Retrieve(batch.id);
-            Assert.AreEqual(batch.id, retrieved.id);
+        public void TestRetrieve()
+        {
+            var batch = _client.CreateBatch();
+            var retrieved = _client.GetBatch(batch.Id);
+            Assert.AreEqual(batch.Id, retrieved.Id);
         }
 
         [TestMethod]
-        public void TestAddRemoveShipments() {
-            Batch batch = Batch.Create();
-            Shipment shipment = Shipment.Create(shipmentParameters);
-            Shipment otherShipment = Shipment.Create(shipmentParameters);
+        public void TestAddRemoveShipments()
+        {
+            var batch = _client.CreateBatch();
+            var shipment = _client.CreateShipment(_testShipment);
+            var otherShipment = _client.CreateShipment(_testShipment);
 
-            while (batch.state != "created")
-                batch = Batch.Retrieve(batch.id);
-            batch.AddShipments(new List<Shipment>() { shipment, otherShipment });
+            while (batch.State != "created") {
+                batch = _client.GetBatch(batch.Id);
+            }
 
-            while (batch.shipments == null) { batch = Batch.Retrieve(batch.id); }
-            List<string> shipmentIds = batch.shipments.Select(ship => ship.id).ToList();
-            Assert.AreEqual(batch.num_shipments, 2);
-            CollectionAssert.Contains(shipmentIds, shipment.id);
-            CollectionAssert.Contains(shipmentIds, otherShipment.id);
+            batch = _client.AddShipmentsToBatch(batch.Id, new[] { shipment, otherShipment });
 
-            batch.RemoveShipments(new List<Shipment>() { shipment, otherShipment });
-            Assert.AreEqual(batch.num_shipments, 0);
+            while (batch.Shipments == null) {
+                batch = _client.GetBatch(batch.Id);
+            }
+            var shipmentIds = batch.Shipments.Select(ship => ship.Id).ToList();
+            Assert.AreEqual(batch.NumShipments, 2);
+            CollectionAssert.Contains(shipmentIds, shipment.Id);
+            CollectionAssert.Contains(shipmentIds, otherShipment.Id);
+
+            batch = _client.RemoveShipmentsFromBatch(batch.Id, new[] { shipment, otherShipment });
+            Assert.AreEqual(batch.NumShipments, 0);
         }
 
-        public Batch CreateBatch() {
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "reference", "EasyPostCSharpTest" },
-                { "shipments", new List<Dictionary<string, object>>() { batchShipmentParameters } }
-            };
-
-            return Batch.Create(parameters);
-        }
-
-        [TestMethod]
-        public void TestCreateThenBuyThenGenerateLabelAndScanForm() {
-            Batch batch = CreateBatch();
-
-            Assert.IsNotNull(batch.id);
-            Assert.AreEqual(batch.reference, "EasyPostCSharpTest");
-            Assert.AreEqual(batch.state, "creating");
-
-            while (batch.state == "creating") { batch = Batch.Retrieve(batch.id); }
-            batch.Buy();
-
-            while (batch.state == "created") { batch = Batch.Retrieve(batch.id); }
-            Assert.AreEqual(batch.state, "purchased");
-
-            batch.GenerateLabel("pdf");
-            Assert.AreEqual(batch.state, "label_generating");
-
-            batch.GenerateScanForm();
+        public Batch CreateBatch()
+        {
+            return _client.CreateBatch(new[] { _testBatchShipment }, "EasyPostCSharpTest");
         }
 
         [TestMethod]
-        public void TestGenerateLabelWithOrderBy() {
-            Batch batch = CreateBatch();
+        public void TestCreateThenBuyThenGenerateLabelAndScanForm()
+        {
+            var batch = CreateBatch();
+            
+            Assert.IsNotNull(batch.Id);
+            Assert.AreEqual(batch.Reference, "EasyPostCSharpTest");
+            Assert.AreEqual(batch.State, "creating");
+            
+            while (batch.State == "creating") {
+                batch = _client.GetBatch(batch.Id);
+            }
+            batch = _client.BuyLabelsForBatch(batch.Id);
+            
+            while (batch.State == "created") {
+                batch = _client.GetBatch(batch.Id);
+            }
+            Assert.AreEqual(batch.State, "purchased");
+            
+            batch = _client.GenerateLabelForBatch(batch.Id, "pdf");
+            Assert.AreEqual(batch.State, "label_generating");
+            
+            batch = _client.GenerateScanFormForBatch(batch.Id);
+        }
+        
+        [TestMethod]
+        public void TestGenerateLabelWithOrderBy()
+        {
+            var batch = CreateBatch();
 
-            while (batch.state == "creating") { batch = Batch.Retrieve(batch.id); }
-            batch.Buy();
+            while (batch.State == "creating") {
+                batch = _client.GetBatch(batch.Id);
+            }
+            batch = _client.BuyLabelsForBatch(batch.Id);
 
-            while (batch.state == "created") { batch = Batch.Retrieve(batch.id); }
-            batch.GenerateLabel("pdf", orderBy: "reference DESC");
-
-            Assert.AreEqual(batch.state, "label_generating");
+            while (batch.State == "created") {
+                batch = _client.GetBatch(batch.Id);
+            }
+            batch = _client.GenerateLabelForBatch(batch.Id, "pdf", "reference DESC");
+            Assert.AreEqual(batch.State, "label_generating");
         }
     }
 }

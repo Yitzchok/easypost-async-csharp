@@ -1,69 +1,134 @@
-﻿using System;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
+
+using System;
 using System.Collections.Generic;
 
-namespace EasyPost {
-    public class Tracker : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime tracking_updated_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public DateTime? est_delivery_date { get; set; }
-        public string mode { get; set; }
-        public string shipment_id { get; set; }
-        public string status { get; set; }
-        public string carrier { get; set; }
-        public string tracking_code { get; set; }
-        public string signed_by { get; set; }
-        public double? weight { get; set; }
-        public string public_url { get; set; }
-        public List<TrackingDetail> tracking_details { get; set; }
-        public CarrierDetail carrier_detail { get; set; }
+namespace EasyPost
+{
+    public class Tracker : EasyPostObject
+    {
+        /// <summary>
+        /// The tracking code provided by the carrier
+        /// </summary>
+        public string TrackingCode { get; set; }
 
         /// <summary>
-        /// Get a paginated list of trackers.
+        /// The current status of the package, possible values are "unknown", "pre_transit", "in_transit", "out_for_delivery", "delivered", "available_for_pickup", "return_to_sender", "failure", "cancelled" or "error"
         /// </summary>
-        /// Optional dictionary containing parameters to filter the list with. Valid pairs:
-        ///   * {"tracking_code", string} Tracking number string. Only retrieve trackers with the given tracking code.
-        ///   * {"carrier", string} String representing the tracker's carrier. Only retrieve trackers with the given carrier.
-        ///   * {"before_id", string} String representing a Tracker. Starts with "trk_". Only retrieve trackers created before this id. Takes precedence over after_id.
-        ///   * {"after_id", string} String representing a Tracker. Starts with "trk_". Only retrieve trackers created after this id.
-        ///   * {"start_datetime", datetime} Datetime representing the earliest possible tracker. Only retrieve trackers created at or after this datetime. Defaults to 1 month ago.
-        ///   * {"end_datetime", datetime} Datetime representing the latest possible tracker. Only retrieve trackers created before this datetime. Defaults to the end of the current day.
-        ///   * {"page_size", int} Size of page. Default to 30.
-        /// All invalid keys will be ignored.
-        /// <param name="parameters">
-        /// </param>
-        /// <returns>Instance of EasyPost.ShipmentList</returns>
-        public static TrackerList List(Dictionary<string, object> parameters = null) {
-            Request request = new Request("trackers");
-            request.AddQueryString(parameters ?? new Dictionary<string, object>());
+        public string Status { get; set; }
 
-            TrackerList trackerList = request.Execute<TrackerList>();
-            trackerList.filters = parameters;
-            return trackerList;
-        }
+        /// <summary>
+        /// The name of the person who signed for the package (if available)
+        /// </summary>
+        public string SignedBy { get; set; }
 
-        public static Tracker Create(string carrier, string trackingCode) {
-            Request request = new Request("trackers", RestSharp.Method.POST);
-            Dictionary<string, object> parameters = new Dictionary<string, object>() {
-                { "tracking_code", trackingCode }, { "carrier", carrier }
+        /// <summary>
+        /// The weight of the package as measured by the carrier in ounces (if available)
+        /// </summary>
+        public double? Weight { get; set; }
+
+        /// <summary>
+        /// The estimated delivery date provided by the carrier (if available)
+        /// </summary>
+        public DateTime? EstDeliveryDate { get; set; }
+
+        /// <summary>
+        /// The id of the EasyPost Shipment object associated with the Tracker (if any)
+        /// </summary>
+        public string ShipmentId { get; set; }
+
+        /// <summary>
+        /// The name of the carrier handling the shipment
+        /// </summary>
+        public string Carrier { get; set; }
+
+        /// <summary>
+        /// Array of the associated TrackingDetail objects
+        /// </summary>
+        public List<TrackingDetail> TrackingDetails { get; set; }
+
+        /// <summary>
+        /// The associated CarrierDetail object (if available)
+        /// </summary>
+        public CarrierDetail CarrierDetail { get; set; }
+
+        /// <summary>
+        /// URL to a publicly-accessible html page that shows tracking details for this tracker
+        /// </summary>
+        public string PublicUrl { get; set; }
+
+        /// <summary>
+        /// Array of the associated Fee objects
+        /// </summary>
+        public List<Fee> Fees { get; set; }
+
+        /// <summary>
+        /// Time when tracker was updated
+        /// </summary>
+        public DateTime TrackingUpdatedAt { get; set; }
+    }
+
+    /// <summary>
+    /// Tracker API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
+        /// <summary>
+        /// Creates a tracker for a carrier and tracking code
+        /// </summary>
+        /// <param name="carrier">Carrier</param>
+        /// <param name="trackingCode">Tracking code</param>
+        /// <returns>Tracker instance.</returns>
+        public Tracker CreateTracker(
+            string carrier,
+            string trackingCode)
+        {
+            var request = new EasyPostRequest("trackers", RestSharp.Method.POST);
+            var parameters = new Dictionary<string, object>() {
+                { "tracking_code", trackingCode },
+                { "carrier", carrier }
             };
-
             request.AddBody(parameters, "tracker");
 
-            return request.Execute<Tracker>();
+            return Execute<Tracker>(request);
         }
 
         /// <summary>
         /// Retrieve a Tracker from its id.
         /// </summary>
         /// <param name="id">String representing a Tracker. Starts with "trk_".</param>
-        /// <returns>EasyPost.Tracker instance.</returns>
-        public static Tracker Retrieve(string id) {
-            Request request = new Request("trackers/{id}");
+        /// <returns>Tracker instance.</returns>
+        public Tracker GetTracker(
+            string id)
+        {
+            var request = new EasyPostRequest("trackers/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Tracker>();
+            return Execute<Tracker>(request);
+        }
+
+        /// <summary>
+        /// Get a paginated list of trackers.
+        /// </summary>
+        /// <param name="options">Options for the pagination function</param>
+        /// <returns>Instance of EasyPost.ShipmentList</returns>
+        public TrackerList ListTrackers(
+            TrackerListOptions options = null)
+        {
+            var request = new EasyPostRequest("trackers");
+            if (options != null) {
+                request.AddQueryString(options.AsDictionary());
+            }
+
+            var trackerList = Execute<TrackerList>(request);
+            trackerList.Options = options;
+            return trackerList;
         }
     }
 }

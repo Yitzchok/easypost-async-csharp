@@ -1,23 +1,49 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
+
+using System.Collections.Generic;
 using System.Linq;
 
-namespace EasyPost {
-    public class ReportList {
-        public List<Report> reports { get; set; }
-        public bool has_more { get; set; }
-
-        public Dictionary<string, object> filters { get; set;  }
-        public string type { get; set; }
+namespace EasyPost
+{
+    public class ReportList
+    {
+        /// <summary>
+        /// List of reports
+        /// </summary>
+        public List<Report> Reports { get; set; }
 
         /// <summary>
-        /// Get the next page of reports based on the original parameters passed to ReportList.List().
+        /// True if there are more to retrieve
         /// </summary>
-        /// <returns>A new EasyPost.ScanFormList instance.</returns>
-        public ReportList Next() {
-            filters = filters ?? new Dictionary<string, object>();
-            filters["before_id"] = reports.Last().id;
+        public bool HasMore { get; set; }
 
-            return Report.List(type, filters);
+        /// <summary>
+        /// Type of the report
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Options used to generate the list
+        /// </summary>
+        public ReportListOptions Options { get; set; }
+
+        /// <summary>
+        /// Get the next page of reports based on the original parameters used to generate the list
+        /// </summary>
+        /// <param name="client">Easy post client to use</param>
+        /// <returns>A new ReportList instance.</returns>
+        public ReportList Next(
+            IEasyPostClient client)
+        {
+            var options = Options ?? new ReportListOptions();
+            options.BeforeId = Reports.Last().Id;
+            return client.ListReports(Type, options);
         }
     }
 }

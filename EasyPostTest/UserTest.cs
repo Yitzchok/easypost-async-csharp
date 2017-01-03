@@ -1,42 +1,57 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EasyPost;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class UserTest {
+    public class UserTest
+    {
+        private EasyPostClient _client;
+
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("VJ63zukvLyxz92NKP1k0EQ");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("VJ63zukvLyxz92NKP1k0EQ");
         }
 
         [TestMethod]
-        public void TestRetrieveSelf() {
-            User user = User.Retrieve();
-            Assert.IsNotNull(user.id);
+        public void TestRetrieveSelf()
+        {
+            var user = _client.GetUser();
+            Assert.IsNotNull(user.Id);
 
-            User user2 = User.Retrieve(user.id);
-            Assert.AreEqual(user.id, user2.id);
+            var user2 = _client.GetUser(user.Id);
+            Assert.AreEqual(user.Id, user2.Id);
         }
 
         [TestMethod]
-        public void TestCRUD() {
-            User user = User.Create(new Dictionary<string, object>() { { "name", "Test Name" } });
-            Assert.AreEqual(user.api_keys.Count, 2);
-            Assert.IsNotNull(user.id);
+        public void TestCrud()
+        {
+            var user = _client.CreateUser("Test Name");
+            Assert.AreEqual(user.ApiKeys.Count, 2);
+            Assert.IsNotNull(user.Id);
 
-            User other = User.Retrieve(user.id);
-            Assert.AreEqual(user.id, other.id);
+            var other = _client.GetUser(user.Id);
+            Assert.AreEqual(user.Id, other.Id);
 
-            user.Update(new Dictionary<string, object>() { { "name", "NewTest Name" } });
-            Assert.AreEqual("NewTest Name", user.name);
+            user.Name = "NewTest Name";
+            user = _client.UpdateUser(user);
+            Assert.AreEqual("NewTest Name", user.Name);
 
-            user.Destroy();
+            _client.DestroyUser(user.Id);
             try {
-                User.Retrieve(user.id);
+                _client.GetUser(user.Id);
                 Assert.Fail();
-            } catch (HttpException) { }
+            } catch (HttpException) {
+            }
         }
     }
 }

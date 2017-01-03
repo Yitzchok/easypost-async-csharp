@@ -1,63 +1,219 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using RestSharp;
 
-namespace EasyPost {
-    public class Shipment : Resource {
-        public string id { get; set; }
-        public string mode { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string tracking_code { get; set; }
-        public string reference { get; set; }
-        public string status { get; set; }
-        public bool? is_return { get; set; }
-        public Options options { get; set; }
-        public List<Message> messages { get; set; }
-        public CustomsInfo customs_info { get; set; }
-        public Address from_address { get; set; }
-        public Address to_address { get; set; }
-        public Parcel parcel { get; set; }
-        public PostageLabel postage_label { get; set; }
-        public List<Rate> rates { get; set; }
-        public List<Fee> fees { get; set; }
-        public ScanForm scan_form { get; set; }
-        public List<Form> forms { get; set; }
-        public Rate selected_rate { get; set; }
-        public Tracker tracker { get; set; }
-        public Address buyer_address { get; set; }
-        public Address return_address { get; set; }
-        public string refund_status { get; set; }
-        public string insurance { get; set; }
-        public string batch_status { get; set; }
-        public string batch_message { get; set; }
-        public string usps_zone { get; set; }
-        public string stamp_url { get; set; }
-        public string barcode_url { get; set; }
-        public List<CarrierAccount> carrier_accounts { get; set; }
+namespace EasyPost
+{
+    public class Shipment : EasyPostObject
+    {
+        /// <summary>
+        /// The destination address
+        /// </summary>
+        public Address ToAddress { get; set; }
 
+        /// <summary>
+        /// The origin address
+        /// </summary>
+        public Address FromAddress { get; set; }
+
+        /// <summary>
+        /// The shipper's address, defaults to FromAddress
+        /// </summary>
+        public Address ReturnAddress { get; set; }
+
+        /// <summary>
+        /// The buyer's address, defaults to ToAddress
+        /// </summary>
+        public Address BuyerAddress { get; set; }
+
+        /// <summary>
+        /// The dimensions and weight of the package
+        /// </summary>
+        public Parcel Parcel { get; set; }
+
+        /// <summary>
+        /// Information for the processing of customs
+        /// </summary>
+        public CustomsInfo CustomsInfo { get; set; }
+
+        /// <summary>
+        /// Document created to manifest and scan multiple shipments
+        /// </summary>
+        public ScanForm ScanForm { get; set; }
+
+        /// <summary>
+        /// All associated Form objects
+        /// </summary>
+        public List<Form> Forms { get; set; }
+
+        /// <summary>
+        /// The associated Insurance object
+        /// </summary>
+        public string Insurance { get; set; }
+
+        /// <summary>
+        /// All associated Rate objects
+        /// </summary>
+        public List<CarrierRate> Rates { get; set; }
+
+        /// <summary>
+        /// The specific rate purchased for the shipment, or null if unpurchased or purchased through another mechanism
+        /// </summary>
+        public CarrierRate SelectedRate { get; set; }
+
+        /// <summary>
+        /// The associated PostageLabel object
+        /// </summary>
+        public PostageLabel PostageLabel { get; set; }
+
+        /// <summary>
+        /// Any carrier errors encountered during rating, discussed in more depth below
+        /// </summary>
+        public List<EasyPostMessage> Messages { get; set; }
+
+        /// <summary>
+        /// All of the options passed to the shipment, discussed in more depth below
+        /// </summary>
+        public Options Options { get; set; }
+
+        /// <summary>
+        /// Set true to create as a return, discussed in more depth below
+        /// </summary>
+        public bool? IsReturn { get; set; }
+
+        /// <summary>
+        /// If purchased, the tracking code will appear here as well as within the Tracker object
+        /// </summary>
+        public string TrackingCode { get; set; }
+
+        /// <summary>
+        /// The USPS zone of the shipment, if purchased with USPS
+        /// </summary>
+        public string UspsZone { get; set; }
+
+        /// <summary>
+        /// The current tracking status of the shipment
+        /// </summary>
+        public string Status { get; set; }
+
+        /// <summary>
+        /// The associated Tracker object
+        /// </summary>
+        public Tracker Tracker { get; set; }
+
+        /// <summary>
+        /// The associated Fee objects charged to the billing user account
+        /// </summary>
+        public List<Fee> Fees { get; set; }
+
+        /// <summary>
+        /// The current status of the shipment refund process. Possible values are "submitted", "refunded", "rejected".
+        /// </summary>
+        public string RefundStatus { get; set; }
+
+        /// <summary>
+        /// The ID of the batch that contains this shipment, if any
+        /// </summary>
+        public string BatchId { get; set; }
+
+        /// <summary>
+        /// The current state of the associated BatchShipment
+        /// </summary>
+        public string BatchStatus { get; set; }
+
+        /// <summary>
+        /// The current message of the associated BatchShipment
+        /// </summary>
+        public string BatchMessage { get; set; }
+
+        /// <summary>
+        /// The stamp Url
+        /// </summary>
+        public string StampUrl { get; set; }
+
+        /// <summary>
+        /// The barcode Url
+        /// </summary>
+        public string BarcodeUrl { get; set; }
+
+        /// <summary>
+        /// Carrier accounts to use
+        /// </summary>
+        public List<CarrierAccount> CarrierAccounts { get; set; }
+
+        /// <summary>
+        /// Optional carrier to select for this shipment. I believe this only works for creation of shipments when creating a batch.
+        /// </summary>
+        public string Carrier { get; set; }
+
+        /// <summary>
+        /// Optional service to select for this shipment. I believe this only works for creation of shipments when creating a batch.
+        /// </summary>
+        public string Service { get; set; }
+
+        /// <summary>
+        /// Get the lowest rate for the shipment. Optionally whitelist/blacklist carriers and services from the search.
+        /// </summary>
+        /// <param name="includeCarriers">Carriers whitelist.</param>
+        /// <param name="includeServices">Services whitelist.</param>
+        /// <param name="excludeCarriers">Carriers blacklist.</param>
+        /// <param name="excludeServices">Services blacklist.</param>
+        /// <returns>EasyPost.Rate instance or null if no rate was found.</returns>
+        public CarrierRate LowestRate(
+            IEnumerable<string> includeCarriers = null,
+            IEnumerable<string> includeServices = null,
+            IEnumerable<string> excludeCarriers = null,
+            IEnumerable<string> excludeServices = null)
+        {
+            if (Rates == null) {
+                throw new ArgumentException("Shipment rates cannot be null!", nameof(Rates));
+            }
+            var result = Rates.Select(p => p);
+            if (includeCarriers != null) {
+                result = result.Where(rate => includeCarriers.Contains(rate.Carrier));
+            }
+            if (includeServices != null) {
+                result = result.Where(rate => includeServices.Contains(rate.Service));
+            }
+            if (excludeCarriers != null) {
+                result = result.Where(rate => !excludeCarriers.Contains(rate.Carrier));
+            }
+            if (excludeServices != null) {
+                result = result.Where(rate => !excludeServices.Contains(rate.Service));
+            }
+            return result.OrderBy(rate => rate.Rate).FirstOrDefault();
+        }
+    }
+
+    /// <summary>
+    /// Shipment API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Get a paginated list of shipments.
         /// </summary>
-        /// Optional dictionary containing parameters to filter the list with. Valid pairs:
-        ///   * {"before_id", string} String representing a Shipment. Starts with "shp_". Only retrieve shipments created before this id. Takes precedence over after_id.
-        ///   * {"after_id", string} String representing a Shipment. Starts with "shp_". Only retrieve shipments created after this id.
-        ///   * {"start_datetime", DateTime} Starting time for the search.
-        ///   * {"end_datetime", DateTime} Ending time for the search.
-        ///   * {"page_size", int} Size of page. Default to 20.
-        ///   * {"purchased", bool} If true only display purchased shipments.
-        /// All invalid keys will be ignored.
-        /// <param name="parameters">
-        /// </param>
+        /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ShipmentList</returns>
-        public static ShipmentList List(Dictionary<string, object> parameters = null) {
-            Request request = new Request("shipments");
-            request.AddQueryString(parameters ?? new Dictionary<string, object>());
+        public ShipmentList ListShipments(
+            ShipmentListOptions options = null)
+        {
+            var request = new EasyPostRequest("shipments");
+            if (options != null) {
+                request.AddQueryString(options.AsDictionary());
+            }
 
-            ShipmentList shipmentList = request.Execute<ShipmentList>();
-            shipmentList.filters = parameters;
+            var shipmentList = Execute<ShipmentList>(request);
+            shipmentList.Options = options;
             return shipmentList;
         }
 
@@ -65,184 +221,142 @@ namespace EasyPost {
         /// Retrieve a Shipment from its id.
         /// </summary>
         /// <param name="id">String representing a Shipment. Starts with "shp_".</param>
-        /// <returns>EasyPost.Shipment instance.</returns>
-        public static Shipment Retrieve(string id) {
-            Request request = new Request("shipments/{id}");
+        /// <returns>Shipment instance.</returns>
+        public Shipment GetShipment(
+            string id)
+        {
+            var request = new EasyPostRequest("shipments/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Shipment>();
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
         /// Create a Shipment.
         /// </summary>
-        /// <param name="parameters">
-        /// Optional dictionary containing parameters to create the shipment with. Valid pairs:
-        ///   * {"from_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"to_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"buyer_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"return_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"parcel", Dictionary<string, object>} See Parcel.Create for list of valid keys.
-        ///   * {"customs_info", Dictionary<string, object>} See CustomsInfo.Create for lsit of valid keys.
-        ///   * {"options", Dictionary<string, object>} See https://www.easypost.com/docs/api#shipments for list of options.
-        ///   * {"is_return", bool}
-        ///   * {"currency", string} Defaults to "USD".
-        ///   * {"reference", string}
-        ///   * {"carrier_accounts", List<string>} List of CarrierAccount.id to limit rating.
-        /// All invalid keys will be ignored.
-        /// </param>
-        /// <returns>EasyPost.Batch instance.</returns>
-        public static Shipment Create(Dictionary<string, object> parameters = null) {
-            return sendCreate(parameters ?? new Dictionary<string, object>());
-        }
-
-        /// <summary>
-        /// Create this Shipment.
-        /// </summary>
-        /// <exception cref="ResourceAlreadyCreated">Shipment already has an id.</exception>
-        public void Create() {
-            if (id != null)
+        /// <param name="shipment">Shipment details</param>
+        /// <returns>Shipment instance.</returns>
+        public Shipment CreateShipment(
+            Shipment shipment)
+        {
+            if (shipment.Id != null) {
                 throw new ResourceAlreadyCreated();
-            Merge(sendCreate(this.AsDictionary()));
-        }
+            }
 
-        private static Shipment sendCreate(Dictionary<string, object> parameters) {
-            Request request = new Request("shipments", Method.POST);
-            request.AddBody(parameters, "shipment");
+            var request = new EasyPostRequest("shipments", Method.POST);
+            request.AddBody(shipment.AsDictionary(), "shipment");
 
-            return request.Execute<Shipment>();
-        }
-
-        /// <summary>
-        /// Populate the rates property for this shipment
-        /// </summary>
-        public void GetRates() {
-            if (id == null)
-                Create();
-
-            Request request = new Request("shipments/{id}/rates");
-            request.AddUrlSegment("id", id);
-
-            rates = request.Execute<Shipment>().rates;
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
-        /// Purchase a label for this shipment with the given rate.
+        /// Re-populate the rates property for this shipment
         /// </summary>
+        /// <param name="shipment">The shipment to regenerate rates for</param>
+        public void RegenerateRates(
+            Shipment shipment)
+        {
+            var request = new EasyPostRequest("shipments/{id}/rates");
+            request.AddUrlSegment("id", shipment.Id);
+
+            shipment.Rates = Execute<Shipment>(request).Rates;
+        }
+
+        /// <summary>
+        /// Buy a label for this shipment with the given rate.
+        /// </summary>
+        /// <param name="id">The id of the shipment to buy the label for</param>
         /// <param name="rateId">The id of the rate to purchase the shipment with.</param>
-        public void Buy(string rateId) {
-            Request request = new Request("shipments/{id}/buy", Method.POST);
+        /// <returns>Shipment instance.</returns>
+        public Shipment BuyShipment(
+            string id,
+            string rateId)
+        {
+            var request = new EasyPostRequest("shipments/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);
-            request.AddBody(new Dictionary<string, object>() { { "id", rateId } }, "rate");
+            request.AddBody(new Dictionary<string, object> { { "id", rateId } }, "rate");
 
-            Shipment result = request.Execute<Shipment>();
-
-            insurance = result.insurance;
-            postage_label = result.postage_label;
-            tracking_code = result.tracking_code;
-            tracker = result.tracker;
-            selected_rate = result.selected_rate;
-            forms = result.forms;
-            messages = result.messages;
-            fees = result.fees;
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
-        /// Purchase a label for this shipment with the given rate.
+        /// Buy insurance for a shipment for the given amount.
         /// </summary>
-        /// <param name="rate">EasyPost.Rate object to puchase the shipment with.</param>
-        public void Buy(Rate rate) {
-            Buy(rate.id);
-        }
-
-        /// <summary>
-        /// Insure shipment for the given amount.
-        /// </summary>
+        /// <param name="id">The id of the shipment to buy insurance for</param>
         /// <param name="amount">The amount to insure the shipment for. Currency is provided when creating a shipment.</param>
-        public void Insure(double amount) {
-            Request request = new Request("shipments/{id}/insure", Method.POST);
+        /// <returns>Shipment instance.</returns>
+        public Shipment BuyInsuranceForShipment(
+            string id,
+            double amount)
+        {
+            var request = new EasyPostRequest("shipments/{id}/insure", Method.POST);
             request.AddUrlSegment("id", id);
-            request.AddBody(new List<Tuple<string, string>>() {
-                new Tuple<string, string>("amount", amount.ToString())
+            request.AddBody(new List<KeyValuePair<string, string>> {
+                new KeyValuePair<string, string>("amount", amount.ToString())
             });
 
-            Merge(request.Execute<Shipment>());
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
         /// Generate a postage label for this shipment.
         /// </summary>
+        /// <param name="id">The id of the shipment to generate the label for</param>
         /// <param name="fileFormat">Format to generate the label in. Valid formats: "pdf", "zpl" and "epl2".</param>
-        public void GenerateLabel(string fileFormat) {
-            Request request = new Request("shipments/{id}/label");
+        /// <returns>Shipment instance.</returns>
+        public Shipment GenerateLabel(
+            string id,
+            string fileFormat)
+        {
+            var request = new EasyPostRequest("shipments/{id}/label");
             request.AddUrlSegment("id", id);
+
             // This is a GET, but uses the request body, so use ParameterType.GetOrPost instead.
             request.AddParameter("file_format", fileFormat, ParameterType.GetOrPost);
 
-            Merge(request.Execute<Shipment>());
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
         /// Generate a stamp for this shipment.
         /// </summary>
-        public void GenerateStamp() {
-            Request request = new Request("shipments/{id}/stamp");
+        /// <param name="id">The id of the shipment to generate the stamp for</param>
+        /// <returns>URL for the stamp</returns>
+        public string GenerateStamp(
+            string id)
+        {
+            var request = new EasyPostRequest("shipments/{id}/stamp");
             request.AddUrlSegment("id", id);
 
-            Shipment result = request.Execute<Shipment>();
-            stamp_url = result.stamp_url;
+            return Execute<Shipment>(request).StampUrl;
         }
 
         /// <summary>
         /// Generate a barcode for this shipment.
         /// </summary>
-        public void GenerateBarcode() {
-            Request request = new Request("shipments/{id}/barcode");
+        /// <param name="id">The id of the shipment to generate the stamp for</param>
+        /// <returns>URL for the barcode</returns>
+        public string GenerateBarcode(
+            string id)
+        {
+            var request = new EasyPostRequest("shipments/{id}/barcode");
             request.AddUrlSegment("id", id);
 
-            Shipment result = request.Execute<Shipment>();
-            barcode_url = result.barcode_url;
+            return Execute<Shipment>(request).BarcodeUrl;
         }
 
         /// <summary>
         /// Send a refund request to the carrier the shipment was purchased from.
         /// </summary>
-        public void Refund() {
-            Request request = new Request("shipments/{id}/refund");
+        /// <param name="id">The id of the shipment to refund</param>
+        /// <returns>Shipment instance.</returns>
+        public Shipment RefundShipment(
+            string id)
+        {
+            var request = new EasyPostRequest("shipments/{id}/refund");
             request.AddUrlSegment("id", id);
 
-            Merge(request.Execute<Shipment>());
-        }
-
-        /// <summary>
-        /// Get the lowest rate for the shipment. Optionally whitelist/blacklist carriers and servies from the search.
-        /// </summary>
-        /// <param name="includeCarriers">Carriers whitelist.</param>
-        /// <param name="includeServices">Services whitelist.</param>
-        /// <param name="excludeCarriers">Carriers blacklist.</param>
-        /// <param name="excludeServices">Services blacklist.</param>
-        /// <returns>EasyPost.Rate instance or null if no rate was found.</returns>
-        public Rate LowestRate(IEnumerable<string> includeCarriers = null, IEnumerable<string> includeServices = null,
-                               IEnumerable<string> excludeCarriers = null, IEnumerable<string> excludeServices = null) {
-            if (rates == null)
-                GetRates();
-
-            List<Rate> result = new List<Rate>(rates);
-
-            if (includeCarriers != null)
-                filterRates(ref result, rate => includeCarriers.Contains(rate.carrier));
-            if (includeServices != null)
-                filterRates(ref result, rate => includeServices.Contains(rate.service));
-            if (excludeCarriers != null)
-                filterRates(ref result, rate => !excludeCarriers.Contains(rate.carrier));
-            if (excludeServices != null)
-                filterRates(ref result, rate => !excludeServices.Contains(rate.service));
-
-            return result.OrderBy(rate => double.Parse(rate.rate)).FirstOrDefault();
-        }
-
-        private void filterRates(ref List<Rate> rates, Func<Rate, bool> filter) {
-            rates = rates.Where(filter).ToList();
+            return Execute<Shipment>(request);
         }
     }
 }

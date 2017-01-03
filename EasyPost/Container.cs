@@ -1,53 +1,83 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using RestSharp;
 
-namespace EasyPost {
-    public class Container : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string name { get; set; }
-        public string type { get; set; }
-        public string reference { get; set; }
-        public double length { get; set; }
-        public double width { get; set; }
-        public double height { get; set; }
-        public double max_weight { get; set; }
+namespace EasyPost
+{
+    public class Container : EasyPostObject
+    {
+        /// <summary>
+        /// Name of the container
+        /// </summary>
+        public string Name { get; set; }
 
+        /// <summary>
+        /// Type of the container
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Length of the container
+        /// </summary>
+        public double Length { get; set; }
+
+        /// <summary>
+        /// Width of the container
+        /// </summary>
+        public double Width { get; set; }
+
+        /// <summary>
+        /// Height of the container
+        /// </summary>
+        public double Height { get; set; }
+
+        /// <summary>
+        /// Max weight of the container
+        /// </summary>
+        public double MaxWeight { get; set; }
+    }
+
+    /// <summary>
+    /// Container API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve a Container from its id or reference.
         /// </summary>
         /// <param name="id">String representing a Container. Starts with "container_" if passing an id.</param>
-        /// <returns>EasyPost.Container instance.</returns>
-        public static Container Retrieve(string id) {
-            Request request = new Request("containers/{id}");
+        /// <returns>Container instance.</returns>
+        public Container GetContainer(
+            string id)
+        {
+            var request = new EasyPostRequest("containers/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Container>();
+            return Execute<Container>(request);
         }
 
         /// <summary>
         /// Create a Container.
         /// </summary>
-        /// <param name="parameters">
-        /// Dictionary containing parameters to create the container with. Valid pairs:
-        ///   * {"name", string}
-        ///   * {"type", string}
-        ///   * {"reference", string}
-        ///   * {"length", double}
-        ///   * {"width", double}
-        ///   * {"height", double}
-        ///   * {"max_weight", double}
-        /// All invalid keys will be ignored.
-        /// </param>
+        /// <param name="container">Container parameters</param>
         /// <returns>EasyPost.Container instance.</returns>
-        public static Container Create(Dictionary<string, object> parameters) {
-            Request request = new Request("containers", Method.POST);
-            request.AddBody(parameters, "container");
+        public Container CreateContainer(
+            Container container)
+        {
+            if (container.Id != null) {
+                throw new ResourceAlreadyCreated();
+            }
 
-            return request.Execute<Container>();
+            var request = new EasyPostRequest("containers", Method.POST);
+            request.AddBody(container.AsDictionary(), "container");
+
+            return Execute<Container>(request);
         }
     }
 }

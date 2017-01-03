@@ -1,39 +1,73 @@
-﻿using System;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
+
 using System.Collections.Generic;
 
-namespace EasyPost {
-    public class ScanForm : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public List<string> tracking_codes { get; set; }
-        public Address address { get; set; }
-        public string form_url { get; set; }
-        public string form_file_type { get; set; }
-        public string mode { get; set; }
-        public string status { get; set; }
-        public string message { get; set; }
-        public string batch_id { get; set; }
+namespace EasyPost
+{
+    public class ScanForm : EasyPostObject
+    {
+        /// <summary>
+        /// Current status. Possible values are "creating", "created" and "failed"
+        /// </summary>
+        public string Status { get; set; }
 
+        /// <summary>
+        /// Human readable message explaining any failures
+        /// </summary>
+        public string Message { get; set; }
+
+        /// <summary>
+        /// Address the will be Shipments shipped from
+        /// </summary>
+        public Address Address { get; set; }
+
+        /// <summary>
+        /// Tracking codes included on the ScanForm
+        /// </summary>
+        public List<string> TrackingCodes { get; set; }
+
+        /// <summary>
+        /// Url of the document
+        /// </summary>
+        public string FormUrl { get; set; }
+
+        /// <summary>
+        /// File format of the document
+        /// </summary>
+        public string FormFileType { get; set; }
+
+        /// <summary>
+        /// The id of the associated Batch. Unique, starts with "batch_"
+        /// </summary>
+        public string BatchId { get; set; }
+    }
+
+    /// <summary>
+    /// ScanForm API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Get a paginated list of scan forms.
         /// </summary>
-        /// Optional dictionary containing parameters to filter the list with. Valid pairs:
-        ///   * {"before_id", string} String representing a ScanForm ID. Starts with "sf_". Only retrieve ScanForms created before this id. Takes precedence over after_id.
-        ///   * {"after_id", string} String representing a ScanForm ID. Starts with "sf_". Only retrieve ScanForms created after this id.
-        ///   * {"start_datetime", string} ISO 8601 datetime string. Only retrieve ScanForms created after this datetime.
-        ///   * {"end_datetime", string} ISO 8601 datetime string. Only retrieve ScanForms created before this datetime.
-        ///   * {"page_size", int} Max size of list. Default to 20.
-        /// All invalid keys will be ignored.
-        /// <param name="parameters">
-        /// </param>
-        /// <returns>Instance of EasyPost.ScanForm</returns>
-        public static ScanFormList List(Dictionary<string, object> parameters = null) {
-            Request request = new Request("scan_forms");
-            request.AddQueryString(parameters ?? new Dictionary<string, object>());
+        /// <param name="options">Options for the pagination function</param>
+        /// <returns>Instance of ScanFormList</returns>
+        public ScanFormList ListScanForms(
+            ScanFormListOptions options = null)
+        {
+            var request = new EasyPostRequest("scan_forms");
+            if (options != null) {
+                request.AddQueryString(options.AsDictionary());
+            }
 
-            ScanFormList scanFormList = request.Execute<ScanFormList>();
-            scanFormList.filters = parameters;
+            var scanFormList = Execute<ScanFormList>(request);
+            scanFormList.Options = options;
             return scanFormList;
         }
     }

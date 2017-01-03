@@ -1,20 +1,31 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class CarrierTypeTest {
+    public class CarrierTypeTest
+    {
+        private EasyPostClient _client;
+
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("VJ63zukvLyxz92NKP1k0EQ");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("VJ63zukvLyxz92NKP1k0EQ");
         }
 
         [TestMethod]
-        public void TestAll() {
-            List<CarrierType> types = CarrierType.All();
+        public void TestListCarrierTypes()
+        {
+            var types = _client.ListCarrierTypes();
             Assert.AreNotEqual(0, types.Count);
         }
     }

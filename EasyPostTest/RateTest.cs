@@ -1,57 +1,68 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Collections.Generic;
+using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class RateTest {
+    public class RateTest
+    {
+        private EasyPostClient _client;
+
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
         }
 
         [TestMethod]
-        public void TestRetrieve() {
-            Dictionary<string, object> fromAddress = new Dictionary<string, object>() {
-                { "name", "Andrew Tribone" },
-                { "street1", "480 Fell St" },
-                { "street2", "#3" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94102" }
+        public void TestRetrieve()
+        {
+            var fromAddress = new Address {
+                Name = "Andrew Tribone",
+                Street1 = "480 Fell St",
+                Street2 = "#3",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94102",
             };
-            Dictionary<string, object> toAddress = new Dictionary<string, object>() {
-                { "company", "Simpler Postage Inc" },
-                { "street1", "164 Townsend Street" },
-                { "street2", "Unit 1" },
-                { "city", "San Francisco" },
-                { "state", "CA" },
-                { "country", "US" },
-                { "zip", "94107" }
+            var toAddress = new Address {
+                Company = "Simpler Postage Inc",
+                Street1 = "164 Townsend Street",
+                Street2 = "Unit 1",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94107",
             };
-            Shipment shipment = Shipment.Create(new Dictionary<string, object>() {
-                { "parcel", new Dictionary<string, object>() {
-                    { "length", 8 },
-                    { "width", 6 },
-                    { "height", 5 },
-                    { "weight", 10 }
-                } },
-                { "to_address", toAddress },
-                { "from_address", fromAddress },
-                { "reference", "ShipmentRef" }
-            });
+            var shipment = new Shipment {
+                ToAddress = toAddress,
+                FromAddress = fromAddress,
+                Parcel = new Parcel {
+                    Length = 8,
+                    Width = 6,
+                    Height = 5,
+                    Weight = 10,
+                },
+                Reference = "ShipmentRef",
+            };
+            shipment = _client.CreateShipment(shipment);
 
-            shipment.GetRates();
-            Rate rate = Rate.Retrieve(shipment.rates[0].id);
-            Assert.AreEqual(rate.id, shipment.rates[0].id);
+            var rate = _client.GetRate(shipment.Rates[0].Id);
+            Assert.AreEqual(rate.Id, shipment.Rates[0].Id);
 
-            Assert.IsNotNull(rate.rate);
-            Assert.IsNotNull(rate.currency);
-            Assert.IsNotNull(rate.list_rate);
-            Assert.IsNotNull(rate.list_currency);
+            Assert.IsNotNull(rate.Rate);
+            Assert.IsNotNull(rate.Currency);
+            Assert.IsNotNull(rate.ListRate);
+            Assert.IsNotNull(rate.ListCurrency);
         }
     }
 }

@@ -1,50 +1,62 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
-using System.Text;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EasyPost;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class CarrierAccountTest {
+    public class CarrierAccountTest
+    {
+        private EasyPostClient _client;
+
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("VJ63zukvLyxz92NKP1k0EQ");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("VJ63zukvLyxz92NKP1k0EQ");
         }
 
         [TestMethod]
-        public void TestRetrieve() {
-            CarrierAccount account = CarrierAccount.Retrieve("ca_7c7X1XzO");
-            Assert.AreEqual("ca_7c7X1XzO", account.id);
+        public void TestRetrieve()
+        {
+            var account = _client.GetCarrierAccount("ca_7c7X1XzO");
+            Assert.AreEqual("ca_7c7X1XzO", account.Id);
         }
 
         [TestMethod]
-        public void TestCRUD() {
-            CarrierAccount account = CarrierAccount.Create(new Dictionary<string, object>() {
-                {"type", "EndiciaAccount"},
-                {"description", "description"}
+        public void TestCrud()
+        {
+            var account = _client.CreateCarrierAccount(new CarrierAccount {
+                Type = "EndiciaAccount",
+                Description = "description",
             });
 
-            Assert.IsNotNull(account.id);
-            Assert.AreEqual(account.type, "EndiciaAccount");
+            Assert.IsNotNull(account.Id);
+            Assert.AreEqual(account.Type, "EndiciaAccount");
 
-            account.Update(new Dictionary<string, object>() { { "reference", "new-reference" } });
-            Assert.AreEqual("new-reference", account.reference);
+            account.Reference = "new-reference";
+            account = _client.UpdateCarrierAccount(account);
+            Assert.AreEqual("new-reference", account.Reference);
 
-            account.Destroy();
+            _client.DestroyCarrierAccount(account.Id);
             try {
-                CarrierAccount.Retrieve(account.id);
+                _client.GetCarrierAccount(account.Id);
                 Assert.Fail();
+            } catch (HttpException) {
             }
-            catch (HttpException) { }
         }
 
         [TestMethod]
-        public void TestList() {
-            List<CarrierAccount> accounts = CarrierAccount.List();
-            Assert.AreEqual(accounts[0].id, "ca_7c7X1XzO");
+        public void TestList()
+        {
+            var accounts = _client.ListCarrierAccounts();
+            Assert.AreEqual(accounts[0].Id, "ca_7c7X1XzO");
         }
     }
 }

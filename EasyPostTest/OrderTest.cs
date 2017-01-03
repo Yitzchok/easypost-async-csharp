@@ -1,113 +1,125 @@
-﻿using EasyPost;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using EasyPost;
 
-namespace EasyPostTest {
+namespace EasyPostTest
+{
     [TestClass]
-    public class OrderTest {
-        Dictionary<string, object> parameters, toAddress, fromAddress;
-        List<Dictionary<string, object>> shipments;
+    public class OrderTest
+    {
+        private EasyPostClient _client;
+        private Order _testOrder;
+        private List<Shipment> _testShipments;
+        private Address _fromAddress;
+        private Address _toAddress;
 
         [TestInitialize]
-        public void Initialize() {
-            ClientManager.SetCurrent("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
+        public void Initialize()
+        {
+            _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
 
-            toAddress = new Dictionary<string, object>() {
-                {"company", "Simpler Postage Inc"},
-                {"street1", "164 Townsend Street"},
-                {"street2", "Unit 1"},
-                {"city", "San Francisco"},
-                {"state", "CA"},
-                {"country", "US"},
-                {"zip", "94107"},
+            _toAddress = new Address {
+                Company = "Simpler Postage Inc",
+                Street1 = "164 Townsend Street",
+                Street2 = "Unit 1",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94107",
             };
-            fromAddress = new Dictionary<string, object>() {
-                {"name", "Andrew Tribone"},
-                {"street1", "480 Fell St"},
-                {"street2", "#3"},
-                {"city", "San Francisco"},
-                {"state", "CA"},
-                {"country", "US"},
-                {"zip", "94102"}
+            _fromAddress = new Address {
+                Name = "Andrew Tribone",
+                Street1 = "480 Fell St",
+                Street2 = "#3",
+                City = "San Francisco",
+                State = "CA",
+                Country = "US",
+                Zip = "94102",
             };
-            shipments = new List<Dictionary<string, object>>() {
-                new Dictionary<string, object>() {    
-                    {"parcel", new Dictionary<string, object>() {{"length", 8}, {"width", 6}, {"height", 5}, {"weight", 18}}}
+            _testShipments = new List<Shipment> {
+                new Shipment {
+                    Parcel = new Parcel {
+                        Length = 8,
+                        Width = 6,
+                        Height = 5,
+                        Weight = 18,
+                    },
                 },
-                new Dictionary<string, object>() {    
-                    {"parcel", new Dictionary<string, object>() {{"length", 9}, {"width", 5}, {"height", 4}, {"weight", 18}}}
-                }
+                new Shipment {
+                    Parcel = new Parcel {
+                        Length = 9,
+                        Width = 5,
+                        Height = 4,
+                        Weight = 18,
+                    },
+                },
             };
-
-            parameters = new Dictionary<string, object>() {
-                {"to_address", toAddress},
-                {"from_address", fromAddress},
-                {"reference", "OrderRef"},
-                {"shipments", shipments}
+            _testOrder = new Order {
+                ToAddress = _toAddress,
+                FromAddress = _fromAddress,
+                Reference = "OrderRef",
+                Shipments = _testShipments,
             };
         }
 
         [TestMethod]
-        public void TestCreateAndRetrieveOrder() {
-            Order order = Order.Create(parameters);
+        public void TestCreateAndRetrieveOrder()
+        {
+            var order = _client.CreateOrder(_testOrder);
 
-            Assert.IsNotNull(order.id);
-            Assert.AreEqual(order.reference, "OrderRef");
+            Assert.IsNotNull(order.Id);
+            Assert.AreEqual(order.Reference, "OrderRef");
 
-            Order retrieved = Order.Retrieve(order.id);
-            Assert.AreEqual(order.id, retrieved.id);
+            var retrieved = _client.GetOrder(order.Id);
+            Assert.AreEqual(order.Id, retrieved.Id);
         }
 
         [TestMethod]
         [ExpectedException(typeof(ResourceAlreadyCreated))]
-        public void TestCreateOrderWithId() {
-            Order order = new Order() { id = "order_asjhd" };
-            order.Create();
-        }
-
-        [TestMethod]
-        public void TestCreateFromInstance() {
-            Order order = new Order() {
-                to_address = Address.Create(toAddress),
-                from_address = Address.Create(fromAddress),
-                reference = "OrderRef",
-                shipments = shipments.Select(shipment => Shipment.Create(shipment)).ToList(),
-                carrier_accounts = new List<CarrierAccount>() { new CarrierAccount() { id = "ca_qn6QC6fd" } }
+        public void TestCreateOrderWithId()
+        {
+            var order = new Order {
+                Id = "order_asjhd",
             };
-
-            order.Create();
-
-            Assert.IsNotNull(order.id);
-            Assert.AreEqual(order.reference, "OrderRef");
-            CollectionAssert.AreEqual(new HashSet<string>(order.shipments.SelectMany(s => s.rates).Select(r => r.carrier_account_id)).ToList(), new List<string>() { "ca_qn6QC6fd" });
+            _client.CreateOrder(order);
         }
 
         [TestMethod]
-        public void TestBuyOrder() {
-            Order order = Order.Create(parameters);
-            order.Buy("USPS", "Priority");
-
-            Assert.IsNotNull(order.shipments[0].postage_label);
+        public void TestBuyOrder()
+        {
+            var order = _client.CreateOrder(_testOrder);
+            order = _client.BuyOrder(order.Id, "USPS", "Priority");
+            Assert.IsNotNull(order.Shipments[0].PostageLabel);
         }
-
+        
         [TestMethod]
-        [ExpectedException(typeof(HttpException))]
-        public void TestFailure() {
-            Order.Create(new Dictionary<string, object>());
-        }
+        public void TestOrderCarrierAccounts()
+        {
+            _testOrder.CarrierAccounts = new List<CarrierAccount> {
+                new CarrierAccount {
+                    Id = "ca_qn6QC6fd",
+                }
+            };
+            var order = _client.CreateOrder(_testOrder);
 
-        [TestMethod]
-        public void TestOrderCarrierAccounts() {
-            Dictionary<string, object> carrierAccounts = new Dictionary<string, object>() { { "id", "ca_qn6QC6fd" } };
-            parameters.Add("carrier_accounts", carrierAccounts);
-            Order order = Order.Create(parameters);
-            Assert.AreEqual(3, order.rates.Count);
+            Assert.IsNotNull(order.Id);
+            Assert.AreEqual(order.Reference, "OrderRef");
+            CollectionAssert.AreEqual(new HashSet<string>(order.Shipments.SelectMany(s => s.Rates).Select(r => r.CarrierAccountId)).ToList(),
+                new List<string> { "ca_qn6QC6fd" });
+            Assert.AreEqual(3, order.Rates.Count);
 
-            parameters.Remove("carrier_accounts");
-            order = Order.Create(parameters);
-            Assert.AreEqual(9, order.rates.Count);
+            _testOrder.CarrierAccounts = null;
+            order = _client.CreateOrder(_testOrder);
+            Assert.AreEqual(9, order.Rates.Count);
         }
     }
 }

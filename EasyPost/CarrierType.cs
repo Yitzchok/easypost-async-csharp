@@ -1,15 +1,51 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-namespace EasyPost {
-    public class CarrierType : Resource {
-        public string type { get; set; }
-        public string readable { get; set; }
-        public string logo { get; set; }
-        public Dictionary<string, object> fields { get; set; }
+using System.Collections.Generic;
 
-        public static List<CarrierType> All() {
-            Request request = new Request("carrier_types");
-            return request.Execute<List<CarrierType>>();
+namespace EasyPost
+{
+    public class CarrierType : Resource
+    {
+        /// <summary>
+        /// Specifies the CarrierAccount type. Note that "EndiciaAccount" is the current USPS integration account type
+        /// </summary>
+        public string Type { get; set; }
+
+        /// <summary>
+        /// Readable name for the carrier type
+        /// </summary>
+        public string Readable { get; set; }
+
+        /// <summary>
+        /// Logo for the carrier type
+        /// </summary>
+        public string Logo { get; set; }
+
+        /// <summary>
+        /// Contains at least one of the following keys: "auto_link", "credentials", "test_credentials", and "custom_workflow"
+        /// </summary>
+        public CarrierField Fields { get; set; }
+    }
+
+    /// <summary>
+    /// CarrierAccount API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
+        /// <summary>
+        /// Get a list of all carrier types
+        /// </summary>
+        /// <returns>List of carrier types</returns>
+        public List<CarrierType> ListCarrierTypes()
+        {
+            var request = new EasyPostRequest("carrier_types");
+            return Execute<List<CarrierType>>(request);
         }
     }
 }

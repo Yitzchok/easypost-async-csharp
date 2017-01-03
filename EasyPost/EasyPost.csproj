@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EasyPost</RootNamespace>
-    <AssemblyName>EasyPost</AssemblyName>
+    <AssemblyName>EasyPostAsync</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -37,7 +37,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>EasyPost.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>../EasyPost.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -57,6 +57,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Credentials.cs" />
+    <Compile Include="CarrierField.cs" />
+    <Compile Include="Enumerations.cs" />
     <Compile Include="Address.cs" />
     <Compile Include="ApiKey.cs" />
     <Compile Include="Batch.cs" />
@@ -64,15 +67,20 @@
     <Compile Include="CarrierAccount.cs" />
     <Compile Include="CarrierDetail.cs" />
     <Compile Include="CarrierType.cs" />
+    <Compile Include="IEasyPostClient.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="Event.cs" />
-    <Compile Include="Message.cs" />
+    <Compile Include="EasyPostMessage.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="ClientConfiguration.cs" />
-    <Compile Include="ClientManager.cs" />
     <Compile Include="Report.cs" />
     <Compile Include="ReportList.cs" />
+    <Compile Include="EasyPostObject.cs" />
+    <Compile Include="TrackerListOptions.cs" />
+    <Compile Include="ScanFormListOptions.cs" />
     <Compile Include="Resource.cs" />
+    <Compile Include="ReportListOptions.cs" />
+    <Compile Include="ShipmentListOptions.cs" />
     <Compile Include="TrackerList.cs" />
     <Compile Include="ScanFormList.cs" />
     <Compile Include="Exception.cs" />
@@ -82,22 +90,22 @@
     <Compile Include="Item.cs" />
     <Compile Include="CustomsInfo.cs" />
     <Compile Include="CustomsItem.cs" />
-    <Compile Include="Client.cs" />
+    <Compile Include="EasyPostClient.cs" />
     <Compile Include="IResource.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="Parcel.cs" />
     <Compile Include="Pickup.cs" />
     <Compile Include="PostageLabel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Request.cs" />
+    <Compile Include="EasyPostRequest.cs" />
     <Compile Include="ScanForm.cs" />
-    <Compile Include="Security.cs" />
     <Compile Include="Shipment.cs" />
     <Compile Include="ShipmentList.cs" />
     <Compile Include="Tracker.cs" />
     <Compile Include="TrackingDetail.cs" />
     <Compile Include="TrackingLocation.cs" />
     <Compile Include="User.cs" />
+    <Compile Include="VerificationDetails.cs" />
     <Compile Include="Verification.cs" />
     <Compile Include="Verifications.cs" />
   </ItemGroup>
@@ -105,7 +113,9 @@
     <Compile Include="Rate.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="EasyPost.pfx" />
+    <None Include="..\EasyPost.snk">
+      <Link>EasyPost.snk</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

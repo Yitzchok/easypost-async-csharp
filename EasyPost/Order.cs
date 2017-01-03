@@ -1,102 +1,149 @@
-﻿using RestSharp;
+﻿/*
+ * Licensed under The MIT License (MIT)
+ * 
+ * Copyright (c) 2014 EasyPost
+ * Copyright (C) 2017 AMain.com, Inc.
+ * All Rights Reserved
+ */
 
-using System;
 using System.Collections.Generic;
+using RestSharp;
 
-namespace EasyPost {
-    public class Order : Resource {
-        public string id { get; set; }
-        public DateTime? created_at { get; set; }
-        public DateTime? updated_at { get; set; }
-        public string mode { get; set; }
-        public string reference { get; set; }
-        public bool? is_return { get; set; }
-        public List<Message> messages { get; set; }
-        public Address from_address { get; set; }
-        public Address return_address { get; set; }
-        public Address to_address { get; set; }
-        public Address buyer_address { get; set; }
-        public CustomsInfo customs_info { get; set; }
-        public List<Shipment> shipments { get; set; }
-        public List<CarrierAccount> carrier_accounts { get; set; }
-        public List<Rate> rates { get; set; }
-        public List<Container> containers { get; set; }
-        public List<Item> items { get; set; }
+namespace EasyPost
+{
+    public class Order : EasyPostObject
+    {
+        /// <summary>
+        /// The destination address
+        /// </summary>
+        public Address ToAddress { get; set; }
 
+        /// <summary>
+        /// The origin address
+        /// </summary>
+        public Address FromAddress { get; set; }
+
+        /// <summary>
+        /// The shipper's address, defaults to from_address
+        /// </summary>
+        public Address ReturnAddress { get; set; }
+
+        /// <summary>
+        /// The buyer's address, defaults to to_address
+        /// </summary>
+        public Address BuyerAddress { get; set; }
+
+        /// <summary>
+        /// All associated Shipment objects
+        /// </summary>
+        public List<Shipment> Shipments { get; set; }
+
+        /// <summary>
+        /// All associated Rate objects
+        /// </summary>
+        public List<CarrierRate> Rates { get; set; }
+
+        /// <summary>
+        /// Any carrier errors encountered during rating
+        /// </summary>
+        public List<EasyPostMessage> Messages { get; set; }
+
+        /// <summary>
+        /// Set true to create as a return
+        /// </summary>
+        public bool? IsReturn { get; set; }
+
+        /// <summary>
+        /// Customer information
+        /// </summary>
+        public CustomsInfo CustomsInfo { get; set; }
+
+        /// <summary>
+        /// Carrier accounts
+        /// </summary>
+        public List<CarrierAccount> CarrierAccounts { get; set; }
+
+        /// <summary>
+        /// Containers
+        /// </summary>
+        public List<Container> Containers { get; set; }
+
+        /// <summary>
+        /// Items in the order
+        /// </summary>
+        public List<Item> Items { get; set; }
+    }
+
+    /// <summary>
+    /// Order API implementation
+    /// </summary>
+    public partial class EasyPostClient
+    {
         /// <summary>
         /// Retrieve a Order from its id or reference.
         /// </summary>
         /// <param name="id">String representing a Order. Starts with "order_" if passing an id.</param>
-        /// <returns>EasyPost.Order instance.</returns>
-        public static Order Retrieve(string id) {
-            Request request = new Request("orders/{id}");
+        /// <returns>Order instance.</returns>
+        public Order GetOrder(
+            string id)
+        {
+            var request = new EasyPostRequest("orders/{id}");
             request.AddUrlSegment("id", id);
 
-            return request.Execute<Order>();
+            return Execute<Order>(request);
         }
 
         /// <summary>
         /// Create a Order.
         /// </summary>
-        /// <param name="parameters">
-        /// Dictionary containing parameters to create the order with. Valid pairs:
-        ///   * {"from_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"to_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"buyer_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"return_address", Dictionary<string, object>} See Address.Create for a list of valid keys.
-        ///   * {"customs_info", Dictionary<string, object>} See CustomsInfo.Create for list of valid keys.
-        ///   * {"is_return", bool}
-        ///   * {"reference", string}
-        ///   * {"shipments", IEnumerable<Shipment>} See Shipment.Create for list of valid keys.
-        ///   * {"carrier_accounts", IEnumerable<CarrierAccount>}
-        ///   * {"containers", IEnumerable<Container>} See Container.Create for list of valid keys.
-        ///   * {"items", IEnumerable<Item>} See Item.Create for list of valid keys.
-        /// All invalid keys will be ignored.
-        /// </param>
-        /// <returns>EasyPost.Order instance.</returns>
-        public static Order Create(Dictionary<string, object> parameters) {
-            Request request = new Request("orders", Method.POST);
-            request.AddBody(parameters, "order");
-
-            return request.Execute<Order>();
-        }
-
-        /// <summary>
-        /// Create this Order.
-        /// </summary>
-        /// <exception cref="ResourceAlreadyCreated">Order already has an id.</exception>
-        public void Create() {
-            if (id != null)
+        /// <param name="order">Order details</param>
+        /// <returns>Order instance.</returns>
+        public Order CreateOrder(
+            Order order)
+        {
+            if (order.Id != null) {
                 throw new ResourceAlreadyCreated();
-            Merge(sendCreate(this.AsDictionary()));
-        }
+            }
 
-        private static Order sendCreate(Dictionary<string, object> parameters) {
-            Request request = new Request("orders", Method.POST);
-            request.AddBody(parameters, "order");
+            var request = new EasyPostRequest("orders", Method.POST);
+            request.AddBody(order.AsDictionary(), "order");
 
-            return request.Execute<Order>();
+            return Execute<Order>(request);
         }
 
         /// <summary>
         /// Purchase the shipments within this order with a carrier and service.
         /// </summary>
+        /// <param name="id">Order id to buy</param>
         /// <param name="carrier">The carrier to purchase a shipment from.</param>
         /// <param name="service">The service to purchase.</param>
-        public void Buy(string carrier, string service) {
-            Request request = new Request("orders/{id}/buy", Method.POST);
+        /// <returns>Order instance.</returns>
+        public Order BuyOrder(
+            string id,
+            string carrier,
+            string service)
+        {
+            var request = new EasyPostRequest("orders/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);
-            request.AddBody(new List<Tuple<string, string>>() { new Tuple<string, string>("carrier", carrier), new Tuple<string, string>("service", service) });
+            request.AddBody(new List<KeyValuePair<string, string>>() {
+                new KeyValuePair<string, string>("carrier", carrier),
+                new KeyValuePair<string, string>("service", service)
+            });
 
-            Merge(request.Execute<Order>());
+            return Execute<Order>(request);
         }
 
         /// <summary>
         /// Purchase a label for this shipment with the given rate.
         /// </summary>
-        /// <param name="rate">EasyPost.Rate object to puchase the shipment with.</param>
-        public void Buy(Rate rate) {
-            Buy(rate.carrier, rate.service);
+        /// <param name="id">Order id to buy</param>
+        /// <param name="rate">Rate object to puchase the shipment with.</param>
+        /// <returns>Order instance.</returns>
+        public Order BuyOrder(
+            string id,
+            CarrierRate rate)
+        {
+            return BuyOrder(id, rate.Carrier, rate.Service);
         }
     }
 }
