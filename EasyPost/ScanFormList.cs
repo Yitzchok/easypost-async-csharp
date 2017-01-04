@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -33,12 +34,12 @@ namespace EasyPost
         /// </summary>
         /// <param name="client">Easy post client to use</param>
         /// <returns>A new ScanFormList instance.</returns>
-        public ScanFormList Next(
+        public async Task<ScanFormList> Next(
             IEasyPostClient client)
         {
             var options = Options ?? new ScanFormListOptions();
             options.BeforeId = ScanForms.Last().Id;
-            return client.ListScanForms(options);
+            return await client.ListScanForms(options);
         }
     }
 }

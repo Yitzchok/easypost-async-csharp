@@ -8,6 +8,7 @@
 
 using EasyPost;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EasyPostTest
@@ -71,80 +72,80 @@ namespace EasyPostTest
         [TestMethod]
         public void TestRetrieve()
         {
-            var batch = _client.CreateBatch();
-            var retrieved = _client.GetBatch(batch.Id);
+            var batch = _client.CreateBatch().Result;
+            var retrieved = _client.GetBatch(batch.Id).Result;
             Assert.AreEqual(batch.Id, retrieved.Id);
         }
 
         [TestMethod]
         public void TestAddRemoveShipments()
         {
-            var batch = _client.CreateBatch();
-            var shipment = _client.CreateShipment(_testShipment);
-            var otherShipment = _client.CreateShipment(_testShipment);
+            var batch = _client.CreateBatch().Result;
+            var shipment = _client.CreateShipment(_testShipment).Result;
+            var otherShipment = _client.CreateShipment(_testShipment).Result;
 
             while (batch.State != "created") {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
 
-            batch = _client.AddShipmentsToBatch(batch.Id, new[] { shipment, otherShipment });
+            batch = _client.AddShipmentsToBatch(batch.Id, new[] { shipment, otherShipment }).Result;
 
             while (batch.Shipments == null) {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
             var shipmentIds = batch.Shipments.Select(ship => ship.Id).ToList();
             Assert.AreEqual(batch.NumShipments, 2);
             CollectionAssert.Contains(shipmentIds, shipment.Id);
             CollectionAssert.Contains(shipmentIds, otherShipment.Id);
 
-            batch = _client.RemoveShipmentsFromBatch(batch.Id, new[] { shipment, otherShipment });
+            batch = _client.RemoveShipmentsFromBatch(batch.Id, new[] { shipment, otherShipment }).Result;
             Assert.AreEqual(batch.NumShipments, 0);
         }
 
-        public Batch CreateBatch()
+        public async Task<Batch> CreateBatch()
         {
-            return _client.CreateBatch(new[] { _testBatchShipment }, "EasyPostCSharpTest");
+            return await _client.CreateBatch(new[] { _testBatchShipment }, "EasyPostCSharpTest");
         }
 
         [TestMethod]
         public void TestCreateThenBuyThenGenerateLabelAndScanForm()
         {
-            var batch = CreateBatch();
+            var batch = CreateBatch().Result;
             
             Assert.IsNotNull(batch.Id);
             Assert.AreEqual(batch.Reference, "EasyPostCSharpTest");
             Assert.AreEqual(batch.State, "creating");
             
             while (batch.State == "creating") {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
-            batch = _client.BuyLabelsForBatch(batch.Id);
+            batch = _client.BuyLabelsForBatch(batch.Id).Result;
             
             while (batch.State == "created") {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
             Assert.AreEqual(batch.State, "purchased");
             
-            batch = _client.GenerateLabelForBatch(batch.Id, "pdf");
+            batch = _client.GenerateLabelForBatch(batch.Id, "pdf").Result;
             Assert.AreEqual(batch.State, "label_generating");
             
-            batch = _client.GenerateScanFormForBatch(batch.Id);
+            batch = _client.GenerateScanFormForBatch(batch.Id).Result;
         }
         
         [TestMethod]
         public void TestGenerateLabelWithOrderBy()
         {
-            var batch = CreateBatch();
+            var batch = CreateBatch().Result;
 
             while (batch.State == "creating") {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
-            batch = _client.BuyLabelsForBatch(batch.Id);
+            batch = _client.BuyLabelsForBatch(batch.Id).Result;
 
             while (batch.State == "created") {
-                batch = _client.GetBatch(batch.Id);
+                batch = _client.GetBatch(batch.Id).Result;
             }
-            batch = _client.GenerateLabelForBatch(batch.Id, "pdf", "reference DESC");
+            batch = _client.GenerateLabelForBatch(batch.Id, "pdf", "reference DESC").Result;
             Assert.AreEqual(batch.State, "label_generating");
         }
     }

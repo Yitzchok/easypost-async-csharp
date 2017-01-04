@@ -54,9 +54,9 @@ namespace EasyPostTest
                 },
                 Reference = "ShipmentRef",
             };
-            shipment = _client.CreateShipment(shipment);
+            shipment = _client.CreateShipment(shipment).Result;
 
-            var rate = _client.GetRate(shipment.Rates[0].Id);
+            var rate = _client.GetRate(shipment.Rates[0].Id).Result;
             Assert.AreEqual(rate.Id, shipment.Rates[0].Id);
 
             Assert.IsNotNull(rate.Rate);

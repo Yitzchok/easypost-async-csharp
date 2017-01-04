@@ -6,6 +6,8 @@
  * All Rights Reserved
  */
 
+using System.Collections.Generic;
+using System.Net;
 using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -33,28 +35,32 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpException))]
         public void TestRetrieveInvalidId()
         {
-            _client.GetAddress("not-an-id");
+            var address = _client.GetAddress("not-an-id").Result;
+            Assert.IsNotNull(address.RequestError);
+            Assert.AreEqual(address.RequestError.StatusCode, HttpStatusCode.NotFound);
+            Assert.AreEqual(address.RequestError.Code, "NOT_FOUND");
+            Assert.AreEqual(address.RequestError.Message, "The requested resource could not be found.");
+            Assert.AreEqual(address.RequestError.Content, "{\"error\":{\"code\":\"NOT_FOUND\",\"message\":\"The requested resource could not be found.\",\"errors\":[]}}");
         }
 
         [TestMethod]
         public void TestCreateAndRetrieve()
         {
-            var address = _client.CreateAddress(_testAddress);
+            var address = _client.CreateAddress(_testAddress).Result;
             Assert.IsNotNull(address.Id);
             Assert.AreEqual(address.Company, "Simpler Postage Inc");
             Assert.IsNull(address.Name);
 
-            var retrieved = _client.GetAddress(address.Id);
+            var retrieved = _client.GetAddress(address.Id).Result;
             Assert.AreEqual(address.Id, retrieved.Id);
         }
 
         [TestMethod]
         public void TestCreateWithVerifications()
         {
-            var address = _client.CreateAddress(_testAddress, VerificationFlags.Delivery | VerificationFlags.Zip4);
+            var address = _client.CreateAddress(_testAddress, VerificationFlags.Delivery | VerificationFlags.Zip4).Result;
             Assert.IsNotNull(address.Verifications.Delivery);
             Assert.AreEqual(address.Verifications.Delivery.Success, true);
             Assert.IsNotNull(address.Verifications.Zip4);
@@ -65,28 +71,36 @@ namespace EasyPostTest
                     Street1 = "123 Fake Street",
                     Zip = "94107"
                 },
-                VerificationFlags.Delivery | VerificationFlags.Zip4);
+                VerificationFlags.Delivery | VerificationFlags.Zip4).Result;
             Assert.AreEqual(address.Verifications.Delivery.Success, false);
             Assert.AreEqual(address.Verifications.Zip4.Success, false);
         }
 
         [TestMethod]
-        [ExpectedException(typeof(HttpException))]
         public void TestCreateWithStrictVerifications()
         {
-            _client.CreateAddress(new Address {
+            var address = _client.CreateAddress(new Address {
                     Company = "Simpler Postage Inc",
                     Street1 = "123 Fake Street",
                     Zip = "94107"
                 },
-                VerificationFlags.DeliveryStrict | VerificationFlags.Zip4Strict);
+                VerificationFlags.DeliveryStrict | VerificationFlags.Zip4Strict).Result;
+            Assert.IsNotNull(address.RequestError);
+            Assert.AreEqual(address.RequestError.StatusCode, (HttpStatusCode)422);
+            Assert.AreEqual(address.RequestError.Code, "ADDRESS.VERIFY.FAILURE");
+            Assert.AreEqual(address.RequestError.Message, "Unable to verify address.");
+            Assert.AreEqual(address.RequestError.Errors.Count, 1);
+            Assert.AreEqual(address.RequestError.Errors[0].Code, "E.ADDRESS.NOT_FOUND");
+            Assert.AreEqual(address.RequestError.Errors[0].Field, "address");
+            Assert.AreEqual(address.RequestError.Errors[0].Message, "Address not found");
+            Assert.AreEqual(address.RequestError.Errors[0].Suggestion, null);
         }
 
         [TestMethod]
         public void TestVerify()
         {
-            var address = _client.CreateAddress(_testAddress);
-            address = _client.VerifyAddress(address);
+            var address = _client.CreateAddress(_testAddress).Result;
+            address = _client.VerifyAddress(address).Result;
             Assert.IsNotNull(address.Id);
             Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
             Assert.AreEqual(address.Street1, "164 TOWNSEND ST UNIT 1");
@@ -97,8 +111,8 @@ namespace EasyPostTest
         [TestMethod]
         public void TestVerifyCarrier()
         {
-            var address = _client.CreateAddress(_testAddress);
-            address = _client.VerifyAddress(address, "usps");
+            var address = _client.CreateAddress(_testAddress).Result;
+            address = _client.VerifyAddress(address, "usps").Result;
             Assert.IsNotNull(address.Id);
             Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
             Assert.AreEqual(address.Street1, "164 TOWNSEND ST UNIT 1");
@@ -108,7 +122,7 @@ namespace EasyPostTest
         [TestMethod]
         public void TestVerifyBeforeCreate()
         {
-            var address = _client.VerifyAddress(_testAddress);
+            var address = _client.VerifyAddress(_testAddress).Result;
             Assert.IsNotNull(address.Id);
             Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
         }

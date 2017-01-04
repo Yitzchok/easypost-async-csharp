@@ -30,8 +30,8 @@ namespace EasyPostTest
                 Width = 20,
                 Height = 5,
                 Weight = 1.8,
-            });
-            var retrieved = _client.GetParcel(parcel.Id);
+            }).Result;
+            var retrieved = _client.GetParcel(parcel.Id).Result;
             Assert.AreEqual(parcel.Id, retrieved.Id);
         }
 
@@ -40,7 +40,7 @@ namespace EasyPostTest
         {
             var parcel = new Parcel { Weight = 1.8, PredefinedPackage = "SMALLFLATRATEBOX" };
             var shipment = new Shipment { Parcel = parcel };
-            _client.CreateShipment(shipment);
+            shipment = _client.CreateShipment(shipment).Result;
 
             Assert.AreEqual(null, shipment.Parcel.Height);
             Assert.AreEqual("SMALLFLATRATEBOX", shipment.Parcel.PredefinedPackage);

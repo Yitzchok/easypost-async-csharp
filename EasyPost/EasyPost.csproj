@@ -40,10 +40,6 @@
     <AssemblyOriginatorKeyFile>../EasyPost.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="RestSharp, Version=100.0.0.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
       <HintPath>..\packages\RestSharpSigned.105.2.3\lib\net45\RestSharp.dll</HintPath>
       <Private>True</Private>
@@ -67,6 +63,7 @@
     <Compile Include="CarrierAccount.cs" />
     <Compile Include="CarrierDetail.cs" />
     <Compile Include="CarrierType.cs" />
+    <Compile Include="RequestError.cs" />
     <Compile Include="IEasyPostClient.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="Event.cs" />
@@ -83,7 +80,6 @@
     <Compile Include="ShipmentListOptions.cs" />
     <Compile Include="TrackerList.cs" />
     <Compile Include="ScanFormList.cs" />
-    <Compile Include="Exception.cs" />
     <Compile Include="Fee.cs" />
     <Compile Include="Form.cs" />
     <Compile Include="Order.cs" />

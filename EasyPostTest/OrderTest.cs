@@ -74,30 +74,20 @@ namespace EasyPostTest
         [TestMethod]
         public void TestCreateAndRetrieveOrder()
         {
-            var order = _client.CreateOrder(_testOrder);
+            var order = _client.CreateOrder(_testOrder).Result;
 
             Assert.IsNotNull(order.Id);
             Assert.AreEqual(order.Reference, "OrderRef");
 
-            var retrieved = _client.GetOrder(order.Id);
+            var retrieved = _client.GetOrder(order.Id).Result;
             Assert.AreEqual(order.Id, retrieved.Id);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(ResourceAlreadyCreated))]
-        public void TestCreateOrderWithId()
-        {
-            var order = new Order {
-                Id = "order_asjhd",
-            };
-            _client.CreateOrder(order);
         }
 
         [TestMethod]
         public void TestBuyOrder()
         {
-            var order = _client.CreateOrder(_testOrder);
-            order = _client.BuyOrder(order.Id, "USPS", "Priority");
+            var order = _client.CreateOrder(_testOrder).Result;
+            order = _client.BuyOrder(order.Id, "USPS", "Priority").Result;
             Assert.IsNotNull(order.Shipments[0].PostageLabel);
         }
         
@@ -109,7 +99,7 @@ namespace EasyPostTest
                     Id = "ca_qn6QC6fd",
                 }
             };
-            var order = _client.CreateOrder(_testOrder);
+            var order = _client.CreateOrder(_testOrder).Result;
 
             Assert.IsNotNull(order.Id);
             Assert.AreEqual(order.Reference, "OrderRef");
@@ -118,7 +108,7 @@ namespace EasyPostTest
             Assert.AreEqual(3, order.Rates.Count);
 
             _testOrder.CarrierAccounts = null;
-            order = _client.CreateOrder(_testOrder);
+            order = _client.CreateOrder(_testOrder).Result;
             Assert.AreEqual(9, order.Rates.Count);
         }
     }

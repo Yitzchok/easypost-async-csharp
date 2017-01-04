@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -58,7 +59,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of ScanFormList</returns>
-        public ScanFormList ListScanForms(
+        public async Task<ScanFormList> ListScanForms(
             ScanFormListOptions options = null)
         {
             var request = new EasyPostRequest("scan_forms");
@@ -66,7 +67,7 @@ namespace EasyPost
                 request.AddQueryString(options.AsDictionary());
             }
 
-            var scanFormList = Execute<ScanFormList>(request);
+            var scanFormList = await Execute<ScanFormList>(request);
             scanFormList.Options = options;
             return scanFormList;
         }

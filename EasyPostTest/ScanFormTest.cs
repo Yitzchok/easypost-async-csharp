@@ -27,10 +27,10 @@ namespace EasyPostTest
         {
             var scanFormList = _client.ListScanForms(new ScanFormListOptions {
                 PageSize = 1,
-            });
+            }).Result;
             Assert.AreNotEqual(null, scanFormList.ScanForms[0].BatchId);
             Assert.AreNotEqual(0, scanFormList.ScanForms.Count);
-            var nextScanFormList = scanFormList.Next(_client);
+            var nextScanFormList = scanFormList.Next(_client).Result;
             Assert.AreNotEqual(scanFormList.ScanForms[0].Id, nextScanFormList.ScanForms[0].Id);
         }
     }

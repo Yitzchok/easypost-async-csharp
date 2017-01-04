@@ -8,6 +8,8 @@ Up-to-date documentation at: https://www.easypost.com/docs/api/csharp
 
 ## Installation
 
+NOTE! The NuGet package is not yet developed...
+
 The easiest way to add EasyPost Async to your project is with the NuGet package manager.
 
 ```
@@ -31,6 +33,23 @@ The EasyPost Async API is initialized using your API key via the EasyPostClient 
 using EasyPost;
 
 var client = new EasyPostClient("ApiKey");
+```
+
+### Error Handling
+
+Error handling for task based Async operations is different than normal operations due to differences in how exception handling works. For this reason the EasyPost Async library does not throw exceptions on error but rather relies on the caller examining the RequestError field of the response. This is filled in with details about the error:
+
+```cs
+using EasyPost;
+
+var address = _client.GetAddress("not-an-id").Result;
+if (address.RequestError != null) {
+    var requestError = address.RequestError;
+    var statusCode = requestError.StatusCode;
+    var errorCode = requestError.Code;
+    var errorMessage = requestError.Message;
+    var errorList = requestError.Errors;
+}
 ```
 
 ### [Address Verification](https://www.easypost.com/docs/api/csharp#create-and-verify-addresses)
@@ -72,9 +91,8 @@ Address address = new Address {
     Zip = "94107",
 };
 
-try {
-    var address = client.CreateAddress(address, VerificationFlags.DeliveryStrict);
-} except (HttpException) {
+var address = client.CreateAddress(address, VerificationFlags.DeliveryStrict);
+if (address.RequestError != null) {
     // unsuccessful verification
 }
 

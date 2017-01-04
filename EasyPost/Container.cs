@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -53,13 +54,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Container. Starts with "container_" if passing an id.</param>
         /// <returns>Container instance.</returns>
-        public Container GetContainer(
+        public async Task<Container> GetContainer(
             string id)
         {
             var request = new EasyPostRequest("containers/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Container>(request);
+            return await Execute<Container>(request);
         }
 
         /// <summary>
@@ -67,17 +68,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="container">Container parameters</param>
         /// <returns>EasyPost.Container instance.</returns>
-        public Container CreateContainer(
+        public async Task<Container> CreateContainer(
             Container container)
         {
-            if (container.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("containers", Method.POST);
             request.AddBody(container.AsDictionary(), "container");
 
-            return Execute<Container>(request);
+            return await Execute<Container>(request);
         }
     }
 }

@@ -68,20 +68,20 @@ namespace EasyPostTest
 
         private Shipment BuyShipment()
         {
-            var shipment = _client.CreateShipment(_testShipment);
-            return _client.BuyShipment(shipment.Id, shipment.Rates[0].Id);
+            var shipment = _client.CreateShipment(_testShipment).Result;
+            return _client.BuyShipment(shipment.Id, shipment.Rates[0].Id).Result;
         }
 
         [TestMethod]
         public void TestCreateAndRetrieve()
         {
-            var shipment = _client.CreateShipment(_testShipment);
+            var shipment = _client.CreateShipment(_testShipment).Result;
             Assert.IsNotNull(shipment.Id);
             Assert.AreEqual(shipment.Reference, "ShipmentRef");
             Assert.IsNotNull(shipment.Rates);
             Assert.AreNotEqual(shipment.Rates.Count, 0);
 
-            var retrieved = _client.GetShipment(shipment.Id);
+            var retrieved = _client.GetShipment(shipment.Id).Result;
             Assert.AreEqual(shipment.Id, retrieved.Id);
             Assert.IsNotNull(retrieved.Rates);
             Assert.AreNotEqual(retrieved.Rates.Count, 0);
@@ -94,7 +94,7 @@ namespace EasyPostTest
             _testShipment.Options = new Options {
                 LabelDate = tomorrow
             };
-            var shipment = _client.CreateShipment(_testShipment);
+            var shipment = _client.CreateShipment(_testShipment).Result;
 
             shipment.Options.LabelDate = shipment.Options.LabelDate.Value.ToLocalTime();
             Assert.AreEqual(shipment.Options.LabelDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
@@ -110,7 +110,7 @@ namespace EasyPostTest
                     Weight = 10,  
                     PredefinedPackage = "FEDEXBOX",
                 },
-            });
+            }).Result;
 
             Assert.IsNotNull(shipment.Id);
             Assert.AreEqual(shipment.Messages[0].Carrier, "UPS");
@@ -119,17 +119,10 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ResourceAlreadyCreated))]
-        public void TestCreateWithId()
-        {
-            _client.CreateShipment(new Shipment { Id = "shp_asdlf" });
-        }
-
-        [TestMethod]
         public void TestRegenerateRates()
         {
-            var shipment = _client.CreateShipment(_testShipment);
-            _client.RegenerateRates(shipment);
+            var shipment = _client.CreateShipment(_testShipment).Result;
+            _client.RegenerateRates(shipment).Wait();
             Assert.IsNotNull(shipment.Id);
             Assert.IsNotNull(shipment.Rates);
         }
@@ -137,14 +130,14 @@ namespace EasyPostTest
         [TestMethod]
         public void TestCreateAndBuyPlusInsurance()
         {
-            var shipment = _client.CreateShipment(_testShipment);
+            var shipment = _client.CreateShipment(_testShipment).Result;
             Assert.IsNotNull(shipment.Rates);
             Assert.AreNotEqual(shipment.Rates.Count, 0);
 
-            shipment = _client.BuyShipment(shipment.Id, shipment.Rates[0].Id);
+            shipment = _client.BuyShipment(shipment.Id, shipment.Rates[0].Id).Result;
             Assert.IsNotNull(shipment.PostageLabel);
 
-            shipment = _client.BuyInsuranceForShipment(shipment.Id, 100.1);
+            shipment = _client.BuyInsuranceForShipment(shipment.Id, 100.1).Result;
             Assert.AreNotEqual(shipment.Insurance, 100.1);
         }
 
@@ -152,7 +145,7 @@ namespace EasyPostTest
         public void TestRefund()
         {
             var shipment = BuyShipment();
-            shipment = _client.RefundShipment(shipment.Id);
+            shipment = _client.RefundShipment(shipment.Id).Result;
             Assert.IsNotNull(shipment.RefundStatus);
         }
 
@@ -161,7 +154,7 @@ namespace EasyPostTest
         {
             var shipment = BuyShipment();
 
-            shipment = _client.GenerateLabel(shipment.Id, "pdf");
+            shipment = _client.GenerateLabel(shipment.Id, "pdf").Result;
             Assert.IsNotNull(shipment.PostageLabel);
 
             var url = _client.GenerateStamp(shipment.Id);
@@ -205,7 +198,7 @@ namespace EasyPostTest
         {
             var shipment = _testShipment;
             shipment.CarrierAccounts = new List<CarrierAccount> { new CarrierAccount { Id = "ca_qn6QC6fd" } };
-            shipment = _client.CreateShipment(_testShipment);
+            shipment = _client.CreateShipment(_testShipment).Result;
             if (shipment.Rates.Count > 0) {
                 Assert.IsTrue(shipment.Rates.TrueForAll(r => r.CarrierAccountId == "ca_qn6QC6fd"));
             }
@@ -214,10 +207,10 @@ namespace EasyPostTest
         [TestMethod]
         public void TestList()
         {
-            var shipmentList = _client.ListShipments();
+            var shipmentList = _client.ListShipments().Result;
             Assert.AreNotEqual(0, shipmentList.Shipments.Count);
 
-            var nextShipmentList = shipmentList.Next(_client);
+            var nextShipmentList = shipmentList.Next(_client).Result;
             Assert.AreNotEqual(0, nextShipmentList.Shipments.Count);
             Assert.AreNotEqual(shipmentList.Shipments[0].Id, nextShipmentList.Shipments[0].Id);
         }

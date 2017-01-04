@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -48,10 +49,10 @@ namespace EasyPost
         /// Get a list of carrier accounts
         /// </summary>
         /// <returns>List of carrier accounts</returns>
-        public List<CarrierAccount> ListCarrierAccounts()
+        public async Task<List<CarrierAccount>> ListCarrierAccounts()
         {
             var request = new EasyPostRequest("carrier_accounts");
-            return Execute<List<CarrierAccount>>(request);
+            return await Execute<List<CarrierAccount>>(request);
         }
 
         /// <summary>
@@ -59,13 +60,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a carrier account. Starts with "ca_".</param>
         /// <returns>CarrierAccount instance.</returns>
-        public CarrierAccount GetCarrierAccount(
+        public async Task<CarrierAccount> GetCarrierAccount(
             string id)
         {
             var request = new EasyPostRequest("carrier_accounts/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<CarrierAccount>(request);
+            return await Execute<CarrierAccount>(request);
         }
 
         /// <summary>
@@ -73,17 +74,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="carrierAccount">Carriern account details to create</param>
         /// <returns>CarrierAccount instance.</returns>
-        public CarrierAccount CreateCarrierAccount(
+        public async Task<CarrierAccount> CreateCarrierAccount(
             CarrierAccount carrierAccount)
         {
-            if (carrierAccount.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("carrier_accounts", Method.POST);
             request.AddBody(carrierAccount.AsDictionary(), "carrier_account");
 
-            return Execute<CarrierAccount>(request);
+            return await Execute<CarrierAccount>(request);
         }
 
         /// <summary>
@@ -91,27 +88,26 @@ namespace EasyPost
         /// </summary>
         /// <param name="carrierAccount">Carrier account details</param>
         /// <returns>CarrierAccount instance.</returns>
-        public CarrierAccount UpdateCarrierAccount(
+        public async Task<CarrierAccount> UpdateCarrierAccount(
             CarrierAccount carrierAccount)
         {
             var request = new EasyPostRequest("carrier_accounts/{id}", Method.PUT);
             request.AddUrlSegment("id", carrierAccount.Id);
             request.AddBody(carrierAccount.AsDictionary(), "carrier_account");
 
-            return Execute<CarrierAccount>(request);
+            return await Execute<CarrierAccount>(request);
         }
 
         /// <summary>
         /// Remove this CarrierAccount from your account.
         /// </summary>
         /// <param name="id">Carrier account id</param>
-        public void DestroyCarrierAccount(
+        public Task DestroyCarrierAccount(
             string id)
         {
             var request = new EasyPostRequest("carrier_accounts/{id}", Method.DELETE);
             request.AddUrlSegment("id", id);
-
-            Execute(request);
+            return Execute(request);
         }
     }
 }

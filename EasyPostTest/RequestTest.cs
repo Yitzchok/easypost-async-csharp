@@ -55,7 +55,7 @@ namespace EasyPostTest
         public void TestAddBodyWithListOfIResource()
         {
             var request = new EasyPostRequest("resource");
-            var address = _client.GetAddress("adr_f1369ed31d114c308f627d8879655bd5");
+            var address = _client.GetAddress("adr_f1369ed31d114c308f627d8879655bd5").Result;
             request.AddBody(new Dictionary<string, object> { { "foo", new List<Address> { address } } }, "parent");
 
             var restRequest = request.RestRequest;

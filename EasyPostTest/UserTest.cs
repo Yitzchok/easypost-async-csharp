@@ -25,33 +25,31 @@ namespace EasyPostTest
         [TestMethod]
         public void TestRetrieveSelf()
         {
-            var user = _client.GetUser();
+            var user = _client.GetUser().Result;
             Assert.IsNotNull(user.Id);
 
-            var user2 = _client.GetUser(user.Id);
+            var user2 = _client.GetUser(user.Id).Result;
             Assert.AreEqual(user.Id, user2.Id);
         }
 
         [TestMethod]
         public void TestCrud()
         {
-            var user = _client.CreateUser("Test Name");
+            var user = _client.CreateUser("Test Name").Result;
             Assert.AreEqual(user.ApiKeys.Count, 2);
             Assert.IsNotNull(user.Id);
 
-            var other = _client.GetUser(user.Id);
+            var other = _client.GetUser(user.Id).Result;
             Assert.AreEqual(user.Id, other.Id);
 
             user.Name = "NewTest Name";
-            user = _client.UpdateUser(user);
+            user = _client.UpdateUser(user).Result;
             Assert.AreEqual("NewTest Name", user.Name);
 
-            _client.DestroyUser(user.Id);
-            try {
-                _client.GetUser(user.Id);
-                Assert.Fail();
-            } catch (HttpException) {
-            }
+            _client.DestroyUser(user.Id).Wait();
+            user = _client.GetUser(user.Id).Result;
+            Assert.IsNotNull(user.RequestError);
+            Assert.AreEqual(user.RequestError.Code, "NOT_FOUND");
         }
     }
 }

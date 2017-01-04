@@ -31,8 +31,8 @@ namespace EasyPostTest
                 Weight = 8,
                 Value = 10.0,
                 Currency = "USD",
-            });
-            var retrieved = _client.GetCustomsItem(item.Id);
+            }).Result;
+            var retrieved = _client.GetCustomsItem(item.Id).Result;
             Assert.AreEqual(item.Id, retrieved.Id);
             Assert.AreEqual(retrieved.Value, 10.0);
             Assert.AreEqual(retrieved.Currency, "USD");

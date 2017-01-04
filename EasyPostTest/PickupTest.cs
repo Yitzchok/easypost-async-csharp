@@ -62,8 +62,8 @@ namespace EasyPostTest
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
                 Reference = "ShipmentRef",
-            });
-            _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id);
+            }).Result;
+            _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id).Wait();
             _testPickup = new Pickup {
                 IsAccountAddress = false,
                 Address = _address,
@@ -76,24 +76,24 @@ namespace EasyPostTest
         [TestMethod]
         public void TestCreateAndRetrieve()
         {
-            var pickup = _client.CreatePickup(_testPickup);
+            var pickup = _client.CreatePickup(_testPickup).Result;
 
             Assert.IsNotNull(pickup.Id);
             Assert.AreEqual(pickup.Address.Street1, "164 Townsend Street");
 
-            var retrieved = _client.GetPickup(pickup.Id);
+            var retrieved = _client.GetPickup(pickup.Id).Result;
             Assert.AreEqual(pickup.Id, retrieved.Id);
         }
 
         [TestMethod]
         public void TestBuyAndCancel()
         {
-            var pickup = _client.CreatePickup(_testPickup);
+            var pickup = _client.CreatePickup(_testPickup).Result;
 
-            pickup = _client.BuyPickup(pickup.Id, "UPS", pickup.PickupRates[0].Service);
+            pickup = _client.BuyPickup(pickup.Id, "UPS", pickup.PickupRates[0].Service).Result;
             Assert.IsNotNull(pickup.Confirmation);
 
-            pickup = _client.CancelPickp(pickup.Id);
+            pickup = _client.CancelPickp(pickup.Id).Result;
             Assert.AreEqual(pickup.Status, "canceled");
         }
     }

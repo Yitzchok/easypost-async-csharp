@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -85,7 +86,7 @@ namespace EasyPost
         /// <param name="carrier">Carrier</param>
         /// <param name="trackingCode">Tracking code</param>
         /// <returns>Tracker instance.</returns>
-        public Tracker CreateTracker(
+        public async Task<Tracker> CreateTracker(
             string carrier,
             string trackingCode)
         {
@@ -96,7 +97,7 @@ namespace EasyPost
             };
             request.AddBody(parameters, "tracker");
 
-            return Execute<Tracker>(request);
+            return await Execute<Tracker>(request);
         }
 
         /// <summary>
@@ -104,13 +105,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Tracker. Starts with "trk_".</param>
         /// <returns>Tracker instance.</returns>
-        public Tracker GetTracker(
+        public async Task<Tracker> GetTracker(
             string id)
         {
             var request = new EasyPostRequest("trackers/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Tracker>(request);
+            return await Execute<Tracker>(request);
         }
 
         /// <summary>
@@ -118,7 +119,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ShipmentList</returns>
-        public TrackerList ListTrackers(
+        public async Task<TrackerList> ListTrackers(
             TrackerListOptions options = null)
         {
             var request = new EasyPostRequest("trackers");
@@ -126,7 +127,7 @@ namespace EasyPost
                 request.AddQueryString(options.AsDictionary());
             }
 
-            var trackerList = Execute<TrackerList>(request);
+            var trackerList = await Execute<TrackerList>(request);
             trackerList.Options = options;
             return trackerList;
         }

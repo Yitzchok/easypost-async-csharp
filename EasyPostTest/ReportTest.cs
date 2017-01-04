@@ -29,21 +29,21 @@ namespace EasyPostTest
                 IncludeChildren = true,
                 // Unfortunately, this can only be run once a day. If you need to test more than that change the date here.
                 //EndDate = DateTime.Parse("2016-06-01"),
-            });
+            }).Result;
             Assert.IsNotNull(report.Id);
             Assert.IsTrue(report.IncludeChildren);
 
-            var retrieved = _client.GetReport("shipment", report.Id);
+            var retrieved = _client.GetReport("shipment", report.Id).Result;
             Assert.AreEqual(report.Id, retrieved.Id);
         }
 
         [TestMethod]
         public void TestList()
         {
-            var reportList = _client.ListReports("shipment");
+            var reportList = _client.ListReports("shipment").Result;
             Assert.AreNotEqual(0, reportList.Reports.Count);
 
-            var nextReportList = reportList.Next(_client);
+            var nextReportList = reportList.Next(_client).Result;
             Assert.AreNotEqual(reportList.Reports[0].Id, nextReportList.Reports[0].Id);
         }
     }

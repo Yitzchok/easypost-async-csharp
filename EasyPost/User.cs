@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -89,7 +90,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a user. Starts with "user_".</param>
         /// <returns>User instance.</returns>
-        public User GetUser(
+        public async Task<User> GetUser(
             string id = null)
         {
             EasyPostRequest request;
@@ -100,7 +101,7 @@ namespace EasyPost
                 request.AddUrlSegment("id", id);
             }
 
-            return Execute<User>(request);
+            return await Execute<User>(request);
         }
 
         /// <summary>
@@ -108,39 +109,39 @@ namespace EasyPost
         /// </summary>
         /// <param name="userName">Name of the user</param>
         /// <returns>EasyPost.User instance.</returns>
-        public User CreateUser(
+        public async Task<User> CreateUser(
             string userName)
         {
             var request = new EasyPostRequest("users", Method.POST);
             request.AddBody(new Dictionary<string, object> { { "name", userName } }, "user");
 
-            return Execute<User>(request);
+            return await Execute<User>(request);
         }
 
         /// <summary>
         /// Update the User associated with the api_key specified.
         /// </summary>
         /// <param name="user">User parameters to update</param>
-        public User UpdateUser(
+        public async Task<User> UpdateUser(
             User user)
         {
             var request = new EasyPostRequest("users/{id}", Method.PUT);
             request.AddUrlSegment("id", user.Id);
             request.AddBody(user.AsDictionary(), "user");
 
-            return Execute<User>(request);
+            return await Execute<User>(request);
         }
 
         /// <summary>
         /// Destroys a user
         /// </summary>
         /// <param name="id">ID of the user</param>
-        public void DestroyUser(
+        public Task DestroyUser(
             string id)
         {
             var request = new EasyPostRequest("users/{id}", Method.DELETE);
             request.AddUrlSegment("id", id);
-            Execute(request);
+            return Execute(request);
         }
     }
 }

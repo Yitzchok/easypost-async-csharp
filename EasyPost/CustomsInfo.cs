@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -69,13 +70,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a CustomsInfo. Starts with "cstinfo_".</param>
         /// <returns>CustomsInfo instance.</returns>
-        public CustomsInfo GetCustomsInfo(
+        public async Task<CustomsInfo> GetCustomsInfo(
             string id)
         {
             var request = new EasyPostRequest("customs_infos/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<CustomsInfo>(request);
+            return await Execute<CustomsInfo>(request);
         }
 
         /// <summary>
@@ -83,17 +84,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="customsInfo">Customs info to create</param>
         /// <returns>EasyPost.CustomsInfo instance.</returns>
-        public CustomsInfo CreateCustomsInfo(
+        public async Task<CustomsInfo> CreateCustomsInfo(
             CustomsInfo customsInfo)
         {
-            if (customsInfo.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("customs_infos", Method.POST);
             request.AddBody(customsInfo.AsDictionary(), "customs_info");
 
-            return Execute<CustomsInfo>(request);
+            return await Execute<CustomsInfo>(request);
         }
     }
 }

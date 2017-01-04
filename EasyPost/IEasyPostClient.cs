@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -19,7 +20,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing an Address. Starts with "adr_".</param>
         /// <returns>EasyPost.Address instance.</returns>
-        Address GetAddress(
+        Task<Address> GetAddress(
             string id);
 
         /// <summary>
@@ -30,7 +31,7 @@ namespace EasyPost
         /// extended zip4 value. If you use the strict versions an HttpException to be raised if unsucessful. 
         /// </param>
         /// <returns>Address instance.</returns>
-        Address CreateAddress(
+        Task<Address> CreateAddress(
             Address address,
             VerificationFlags verify = VerificationFlags.None);
 
@@ -38,7 +39,7 @@ namespace EasyPost
         /// Verify an address.
         /// </summary>
         /// <returns>EasyPost.Address instance. Check message for verification failures.</returns>
-        Address VerifyAddress(
+        Task<Address> VerifyAddress(
             Address address,
             string carrier = null);
 
@@ -51,7 +52,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Batch. Starts with "batch_".</param>
         /// <returns>Batch instance.</returns>
-        Batch GetBatch(
+        Task<Batch> GetBatch(
             string id);
 
         /// <summary>
@@ -60,7 +61,7 @@ namespace EasyPost
         /// <param name="shipments">Optional list of shipments</param>
         /// <param name="reference">Optional reference</param>
         /// <returns>EasyPost.Batch instance.</returns>
-        Batch CreateBatch(
+        Task<Batch> CreateBatch(
             IEnumerable<Shipment> shipments = null,
             string reference = null);
 
@@ -70,7 +71,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipmentIds">List of shipment ids to be added.</param>
         /// <returns>Batch instance.</returns>
-        Batch AddShipmentsToBatch(
+        Task<Batch> AddShipmentsToBatch(
             string id,
             IEnumerable<string> shipmentIds);
 
@@ -80,7 +81,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipments">List of Shipment objects to be added.</param>
         /// <returns>Batch instance.</returns>
-        Batch AddShipmentsToBatch(
+        Task<Batch> AddShipmentsToBatch(
             string id,
             IEnumerable<Shipment> shipments);
 
@@ -90,7 +91,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipmentIds">List of shipment ids to be removed.</param>
         /// <returns>Batch instance.</returns>
-        Batch RemoveShipmentsFromBatch(
+        Task<Batch> RemoveShipmentsFromBatch(
             string id,
             IEnumerable<string> shipmentIds);
 
@@ -100,7 +101,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipments">List of Shipment objects to be removed.</param>
         /// <returns>Batch instance.</returns>
-        Batch RemoveShipmentsFromBatch(
+        Task<Batch> RemoveShipmentsFromBatch(
             string id,
             IEnumerable<Shipment> shipments);
 
@@ -109,7 +110,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Batch id to add the shipments to</param>
         /// <returns>Batch instance.</returns>
-        Batch BuyLabelsForBatch(
+        Task<Batch> BuyLabelsForBatch(
             string id);
 
         /// <summary>
@@ -119,7 +120,7 @@ namespace EasyPost
         /// <param name="fileFormat">Format to generate the label in. Valid formats: "pdf", "zpl" and "epl2".</param>
         /// <param name="orderBy">Optional parameter to order the generated label. Ex: "reference DESC"</param>
         /// <returns>Batch instance.</returns>
-        Batch GenerateLabelForBatch(
+        Task<Batch> GenerateLabelForBatch(
             string id,
             string fileFormat,
             string orderBy = null);
@@ -129,7 +130,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Batch id to generate the label for</param>
         /// <returns>Batch instance.</returns>
-        Batch GenerateScanFormForBatch(
+        Task<Batch> GenerateScanFormForBatch(
             string id);
 
         #endregion
@@ -140,14 +141,14 @@ namespace EasyPost
         /// Get a list of carrier accounts
         /// </summary>
         /// <returns>List of carrier accounts</returns>
-        List<CarrierAccount> ListCarrierAccounts();
+        Task<List<CarrierAccount>> ListCarrierAccounts();
 
         /// <summary>
         /// Retrieve a CarrierAccount from its id.
         /// </summary>
         /// <param name="id">String representing a carrier account. Starts with "ca_".</param>
         /// <returns>CarrierAccount instance.</returns>
-        CarrierAccount GetCarrierAccount(
+        Task<CarrierAccount> GetCarrierAccount(
             string id);
 
         /// <summary>
@@ -155,7 +156,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="carrierAccount">Carriern account details to create</param>
         /// <returns>CarrierAccount instance.</returns>
-        CarrierAccount CreateCarrierAccount(
+        Task<CarrierAccount> CreateCarrierAccount(
             CarrierAccount carrierAccount);
 
         /// <summary>
@@ -163,14 +164,14 @@ namespace EasyPost
         /// </summary>
         /// <param name="carrierAccount">Carrier account details</param>
         /// <returns>CarrierAccount instance.</returns>
-        CarrierAccount UpdateCarrierAccount(
+        Task<CarrierAccount> UpdateCarrierAccount(
             CarrierAccount carrierAccount);
 
         /// <summary>
         /// Remove this CarrierAccount from your account.
         /// </summary>
         /// <param name="id">Carrier account id</param>
-        void DestroyCarrierAccount(
+        Task DestroyCarrierAccount(
             string id);
 
         #endregion
@@ -181,7 +182,7 @@ namespace EasyPost
         /// Get a list of all carrier types
         /// </summary>
         /// <returns>List of carrier types</returns>
-        List<CarrierType> ListCarrierTypes();
+        Task<List<CarrierType>> ListCarrierTypes();
 
         #endregion
 
@@ -192,7 +193,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Container. Starts with "container_" if passing an id.</param>
         /// <returns>Container instance.</returns>
-        Container GetContainer(
+        Task<Container> GetContainer(
             string id);
 
         /// <summary>
@@ -200,7 +201,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="container">Container parameters</param>
         /// <returns>EasyPost.Container instance.</returns>
-        Container CreateContainer(
+        Task<Container> CreateContainer(
             Container container);
 
         #endregion
@@ -212,7 +213,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a CustomsInfo. Starts with "cstinfo_".</param>
         /// <returns>CustomsInfo instance.</returns>
-        CustomsInfo GetCustomsInfo(
+        Task<CustomsInfo> GetCustomsInfo(
             string id);
 
         /// <summary>
@@ -220,7 +221,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="customsInfo">Customs info to create</param>
         /// <returns>EasyPost.CustomsInfo instance.</returns>
-        CustomsInfo CreateCustomsInfo(
+        Task<CustomsInfo> CreateCustomsInfo(
             CustomsInfo customsInfo);
 
         #endregion
@@ -232,7 +233,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a CustomsItem. Starts with "cstitem_".</param>
         /// <returns>CustomsItem instance.</returns>
-        CustomsItem GetCustomsItem(
+        Task<CustomsItem> GetCustomsItem(
             string id);
 
         /// <summary>
@@ -240,7 +241,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="customsItem">Customs item parameters</param>
         /// <returns>EasyPost.CustomsItem instance.</returns>
-        CustomsItem CreateCustomsItem(
+        Task<CustomsItem> CreateCustomsItem(
             CustomsItem customsItem);
 
         #endregion
@@ -252,7 +253,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Event. Starts with "evt_".</param>
         /// <returns>EasyPost.Event instance.</returns>
-        Event GetEvent(
+        Task<Event> GetEvent(
             string id);
 
         #endregion
@@ -264,7 +265,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Item. Starts with "item_" if passing an id.</param>
         /// <returns>Item instance.</returns>
-        Item GetItem(
+        Task<Item> GetItem(
             string id);
 
         /// <summary>
@@ -272,7 +273,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="item">Item to create</param>
         /// <returns>EasyPost.Item instance.</returns>
-        Item CreateItem(
+        Task<Item> CreateItem(
             Item item);
 
         /// <summary>
@@ -281,7 +282,7 @@ namespace EasyPost
         /// <param name="name">String containing the name of the custom reference to search for.</param>
         /// <param name="value">String containing the value of the custom reference to search for.</param>
         /// <returns>Item instance.</returns>
-        Item GetItemByReference(
+        Task<Item> GetItemByReference(
             string name,
             string value);
 
@@ -294,7 +295,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Order. Starts with "order_" if passing an id.</param>
         /// <returns>Order instance.</returns>
-        Order GetOrder(
+        Task<Order> GetOrder(
             string id);
 
         /// <summary>
@@ -302,7 +303,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="order">Order details</param>
         /// <returns>Order instance.</returns>
-        Order CreateOrder(
+        Task<Order> CreateOrder(
             Order order);
 
         /// <summary>
@@ -312,7 +313,7 @@ namespace EasyPost
         /// <param name="carrier">The carrier to purchase a shipment from.</param>
         /// <param name="service">The service to purchase.</param>
         /// <returns>Order instance.</returns>
-        Order BuyOrder(
+        Task<Order> BuyOrder(
             string id,
             string carrier,
             string service);
@@ -323,7 +324,7 @@ namespace EasyPost
         /// <param name="id">Order id to buy</param>
         /// <param name="rate">Rate object to puchase the shipment with.</param>
         /// <returns>Order instance.</returns>
-        Order BuyOrder(
+        Task<Order> BuyOrder(
             string id,
             CarrierRate rate);
 
@@ -336,7 +337,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Parcel. Starts with "prcl_".</param>
         /// <returns>Parcel instance.</returns>
-        Parcel GetParcel(
+        Task<Parcel> GetParcel(
             string id);
 
         /// <summary>
@@ -344,7 +345,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="parcel">Parcel to create</param>
         /// <returns>Parcel instance.</returns>
-        Parcel CreateParcel(
+        Task<Parcel> CreateParcel(
             Parcel parcel);
 
         #endregion
@@ -356,7 +357,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Pickup. Starts with "pickup_".</param>
         /// <returns>Pickup instance.</returns>
-        Pickup GetPickup(
+        Task<Pickup> GetPickup(
             string id);
 
         /// <summary>
@@ -364,7 +365,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="pickup">Pickup to create</param>
         /// <returns>Pickup instance.</returns>
-        Pickup CreatePickup(
+        Task<Pickup> CreatePickup(
             Pickup pickup = null);
 
         /// <summary>
@@ -374,7 +375,7 @@ namespace EasyPost
         /// <param name="carrier">The name of the carrier to purchase with.</param>
         /// <param name="service">The name of the service to purchase.</param>
         /// <returns>Pickup instance.</returns>
-        Pickup BuyPickup(
+        Task<Pickup> BuyPickup(
             string id,
             string carrier,
             string service);
@@ -384,7 +385,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Pickup id to cancel</param>
         /// <returns>Pickup instance.</returns>
-        Pickup CancelPickp(
+        Task<Pickup> CancelPickp(
             string id);
 
         #endregion
@@ -397,7 +398,7 @@ namespace EasyPost
         /// <param name="type">Type of report, e.g. shipment, tracker, payment_log, etc.</param>
         /// <param name="id">String representing a report.</param>
         /// <returns>Report instance.</returns>
-        Report GetReport(
+        Task<Report> GetReport(
             string type,
             string id);
 
@@ -411,7 +412,7 @@ namespace EasyPost
         /// . IncludeChildren
         /// All invalid keys will be ignored. </param>
         /// <returns>Report instance.</returns>
-        Report CreateReport(
+        Task<Report> CreateReport(
             string type,
             Report report = null);
 
@@ -421,7 +422,7 @@ namespace EasyPost
         /// <param name="type">Type of the report</param>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ScanForm</returns>
-        ReportList ListReports(
+        Task<ReportList> ListReports(
             string type,
             ReportListOptions options = null);
 
@@ -434,7 +435,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of ScanFormList</returns>
-        ScanFormList ListScanForms(
+        Task<ScanFormList> ListScanForms(
             ScanFormListOptions options = null);
 
         #endregion
@@ -446,7 +447,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ShipmentList</returns>
-        ShipmentList ListShipments(
+        Task<ShipmentList> ListShipments(
             ShipmentListOptions options = null);
 
         /// <summary>
@@ -454,7 +455,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Shipment. Starts with "shp_".</param>
         /// <returns>Shipment instance.</returns>
-        Shipment GetShipment(
+        Task<Shipment> GetShipment(
             string id);
 
         /// <summary>
@@ -462,14 +463,14 @@ namespace EasyPost
         /// </summary>
         /// <param name="shipment">Shipment details</param>
         /// <returns>Shipment instance.</returns>
-        Shipment CreateShipment(
+        Task<Shipment> CreateShipment(
             Shipment shipment);
 
         /// <summary>
         /// Re-populate the rates property for this shipment
         /// </summary>
         /// <param name="shipment">The shipment to regenerate rates for</param>
-        void RegenerateRates(
+        Task RegenerateRates(
             Shipment shipment);
 
         /// <summary>
@@ -478,7 +479,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to buy the label for</param>
         /// <param name="rateId">The id of the rate to purchase the shipment with.</param>
         /// <returns>Shipment instance.</returns>
-        Shipment BuyShipment(
+        Task<Shipment> BuyShipment(
             string id,
             string rateId);
 
@@ -488,7 +489,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to buy insurance for</param>
         /// <param name="amount">The amount to insure the shipment for. Currency is provided when creating a shipment.</param>
         /// <returns>Shipment instance.</returns>
-        Shipment BuyInsuranceForShipment(
+        Task<Shipment> BuyInsuranceForShipment(
             string id,
             double amount);
 
@@ -498,7 +499,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to generate the label for</param>
         /// <param name="fileFormat">Format to generate the label in. Valid formats: "pdf", "zpl" and "epl2".</param>
         /// <returns>Shipment instance.</returns>
-        Shipment GenerateLabel(
+        Task<Shipment> GenerateLabel(
             string id,
             string fileFormat);
 
@@ -507,7 +508,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">The id of the shipment to generate the stamp for</param>
         /// <returns>URL for the stamp</returns>
-        string GenerateStamp(
+        Task<string> GenerateStamp(
             string id);
 
         /// <summary>
@@ -515,7 +516,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">The id of the shipment to generate the stamp for</param>
         /// <returns>URL for the barcode</returns>
-        string GenerateBarcode(
+        Task<string> GenerateBarcode(
             string id);
 
         /// <summary>
@@ -523,7 +524,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">The id of the shipment to refund</param>
         /// <returns>Shipment instance.</returns>
-        Shipment RefundShipment(
+        Task<Shipment> RefundShipment(
             string id);
 
         #endregion
@@ -536,7 +537,7 @@ namespace EasyPost
         /// <param name="carrier">Carrier</param>
         /// <param name="trackingCode">Tracking code</param>
         /// <returns>Tracker instance.</returns>
-        Tracker CreateTracker(
+        Task<Tracker> CreateTracker(
             string carrier,
             string trackingCode);
 
@@ -545,7 +546,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Tracker. Starts with "trk_".</param>
         /// <returns>Tracker instance.</returns>
-        Tracker GetTracker(
+        Task<Tracker> GetTracker(
             string id);
 
         /// <summary>
@@ -553,7 +554,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ShipmentList</returns>
-        TrackerList ListTrackers(
+        Task<TrackerList> ListTrackers(
             TrackerListOptions options = null);
 
         #endregion
@@ -565,7 +566,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a user. Starts with "user_".</param>
         /// <returns>User instance.</returns>
-        User GetUser(
+        Task<User> GetUser(
             string id = null);
 
         /// <summary>
@@ -573,21 +574,21 @@ namespace EasyPost
         /// </summary>
         /// <param name="userName">Name of the user</param>
         /// <returns>EasyPost.User instance.</returns>
-        User CreateUser(
+        Task<User> CreateUser(
             string userName);
 
         /// <summary>
         /// Update the User associated with the api_key specified.
         /// </summary>
         /// <param name="user">User parameters to update</param>
-        User UpdateUser(
+        Task<User> UpdateUser(
             User user);
 
         /// <summary>
         /// Destroys a user
         /// </summary>
         /// <param name="id">ID of the user</param>
-        void DestroyUser(
+        Task DestroyUser(
             string id);
 
         #endregion

@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -54,13 +55,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Event. Starts with "evt_".</param>
         /// <returns>EasyPost.Event instance.</returns>
-        public Event GetEvent(
+        public async Task<Event> GetEvent(
             string id)
         {
             var request = new EasyPostRequest("events/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Event>(request);
+            return await Execute<Event>(request);
         }
     }
 }

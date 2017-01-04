@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -60,7 +61,7 @@ namespace EasyPost
         /// <param name="type">Type of report, e.g. shipment, tracker, payment_log, etc.</param>
         /// <param name="id">String representing a report.</param>
         /// <returns>Report instance.</returns>
-        public Report GetReport(
+        public async Task<Report> GetReport(
             string type,
             string id)
         {
@@ -68,7 +69,7 @@ namespace EasyPost
             request.AddUrlSegment("id", id);
             request.AddUrlSegment("type", type);
 
-            return Execute<Report>(request);
+            return await Execute<Report>(request);
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace EasyPost
         /// . IncludeChildren
         /// All invalid keys will be ignored. </param>
         /// <returns>Report instance.</returns>
-        public Report CreateReport(
+        public async Task<Report> CreateReport(
             string type,
             Report report = null)
         {
@@ -91,7 +92,7 @@ namespace EasyPost
                 request.AddQueryString(report.AsDictionary());
             }
 
-            return Execute<Report>(request);
+            return await Execute<Report>(request);
         }
 
         /// <summary>
@@ -100,7 +101,7 @@ namespace EasyPost
         /// <param name="type">Type of the report</param>
         /// <param name="options">Options for the pagination function</param>
         /// <returns>Instance of EasyPost.ScanForm</returns>
-        public ReportList ListReports(
+        public async Task<ReportList> ListReports(
             string type,
             ReportListOptions options = null)
         {
@@ -110,7 +111,7 @@ namespace EasyPost
                 request.AddQueryString(options.AsDictionary());
             }
 
-            var reportList = Execute<ReportList>(request);
+            var reportList = await Execute<ReportList>(request);
             reportList.Options = options;
             reportList.Type = type;
             return reportList;

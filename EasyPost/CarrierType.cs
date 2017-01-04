@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -42,10 +43,10 @@ namespace EasyPost
         /// Get a list of all carrier types
         /// </summary>
         /// <returns>List of carrier types</returns>
-        public List<CarrierType> ListCarrierTypes()
+        public async Task<List<CarrierType>> ListCarrierTypes()
         {
             var request = new EasyPostRequest("carrier_types");
-            return Execute<List<CarrierType>>(request);
+            return await Execute<List<CarrierType>>(request);
         }
     }
 }

@@ -49,5 +49,12 @@ namespace EasyPost
         /// instead because ids are guaranteed to be unique within the system, while reference uniqueness is not enforced. 
         /// </summary>
         public string Reference { get; set; }
+
+        /// <summary>
+        /// Request error for the requests get stored here rather than throwing exceptions which wreaks havoc in an Async environment.
+        /// This value is filled in if there was a reques error with the error details. This is not a property so it is never sent
+        /// over the wire and only filled in by the request code.
+        /// </summary>
+        public RequestError RequestError;
     }
 }

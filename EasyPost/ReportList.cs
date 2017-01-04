@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -38,12 +39,12 @@ namespace EasyPost
         /// </summary>
         /// <param name="client">Easy post client to use</param>
         /// <returns>A new ReportList instance.</returns>
-        public ReportList Next(
+        public async Task<ReportList> Next(
             IEasyPostClient client)
         {
             var options = Options ?? new ReportListOptions();
             options.BeforeId = Reports.Last().Id;
-            return client.ListReports(Type, options);
+            return await client.ListReports(Type, options);
         }
     }
 }

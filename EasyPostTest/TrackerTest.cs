@@ -28,22 +28,23 @@ namespace EasyPostTest
             const string carrier = "USPS";
             const string trackingCode = "EZ1000000001";
 
-            var tracker = _client.CreateTracker(carrier, trackingCode);
+            var tracker = _client.CreateTracker(carrier, trackingCode).Result;
             Assert.AreEqual(tracker.TrackingCode, trackingCode);
             Assert.IsNotNull(tracker.EstDeliveryDate);
             Assert.IsNotNull(tracker.Carrier);
             Assert.IsNotNull(tracker.PublicUrl);
 
-            Assert.AreEqual(_client.GetTracker(tracker.Id).Id, tracker.Id);
+            var t = _client.GetTracker(tracker.Id).Result;
+            Assert.AreEqual(t.Id, tracker.Id);
         }
 
         [TestMethod]
         public void TestList()
         {
-            var trackerList = _client.ListTrackers();
+            var trackerList = _client.ListTrackers().Result;
             Assert.AreNotEqual(0, trackerList.Trackers.Count);
 
-            var nextTrackerList = trackerList.Next(_client);
+            var nextTrackerList = trackerList.Next(_client).Result;
             Assert.AreNotEqual(trackerList.Trackers[0].Id, nextTrackerList.Trackers[0].Id);
         }
     }

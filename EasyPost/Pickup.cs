@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -85,13 +86,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Pickup. Starts with "pickup_".</param>
         /// <returns>Pickup instance.</returns>
-        public Pickup GetPickup(
+        public async Task<Pickup> GetPickup(
             string id)
         {
             var request = new EasyPostRequest("pickups/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Pickup>(request);
+            return await Execute<Pickup>(request);
         }
 
         /// <summary>
@@ -99,18 +100,15 @@ namespace EasyPost
         /// </summary>
         /// <param name="pickup">Pickup to create</param>
         /// <returns>Pickup instance.</returns>
-        public Pickup CreatePickup(
+        public async Task<Pickup> CreatePickup(
             Pickup pickup = null)
         {
-            if (pickup?.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
             var request = new EasyPostRequest("pickups", Method.POST);
             if (pickup != null) {
                 request.AddBody(pickup.AsDictionary(), "pickup");
             }
 
-            return Execute<Pickup>(request);
+            return await Execute<Pickup>(request);
         }
 
         /// <summary>
@@ -120,7 +118,7 @@ namespace EasyPost
         /// <param name="carrier">The name of the carrier to purchase with.</param>
         /// <param name="service">The name of the service to purchase.</param>
         /// <returns>Pickup instance.</returns>
-        public Pickup BuyPickup(
+        public async Task<Pickup> BuyPickup(
             string id,
             string carrier,
             string service)
@@ -132,7 +130,7 @@ namespace EasyPost
                 new KeyValuePair<string, string>("service", service)
             });
 
-            return Execute<Pickup>(request);
+            return await Execute<Pickup>(request);
         }
 
         /// <summary>
@@ -140,13 +138,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Pickup id to cancel</param>
         /// <returns>Pickup instance.</returns>
-        public Pickup CancelPickp(
+        public async Task<Pickup> CancelPickp(
             string id)
         {
             var request = new EasyPostRequest("pickups/{id}/cancel", Method.POST);
             request.AddUrlSegment("id", id);
 
-            return Execute<Pickup>(request);
+            return await Execute<Pickup>(request);
         }
     }
 }

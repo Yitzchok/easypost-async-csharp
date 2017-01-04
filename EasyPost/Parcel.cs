@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -49,13 +50,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Parcel. Starts with "prcl_".</param>
         /// <returns>Parcel instance.</returns>
-        public Parcel GetParcel(
+        public async Task<Parcel> GetParcel(
             string id)
         {
             var request = new EasyPostRequest("parcels/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Parcel>(request);
+            return await Execute<Parcel>(request);
         }
 
         /// <summary>
@@ -63,13 +64,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="parcel">Parcel to create</param>
         /// <returns>Parcel instance.</returns>
-        public Parcel CreateParcel(
+        public async Task<Parcel> CreateParcel(
             Parcel parcel)
         {
             var request = new EasyPostRequest("parcels", Method.POST);
             request.AddBody(parcel.AsDictionary(), "parcel");
 
-            return Execute<Parcel>(request);
+            return await Execute<Parcel>(request);
         }
     }
 }

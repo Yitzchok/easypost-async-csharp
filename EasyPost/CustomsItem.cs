@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -63,13 +64,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a CustomsItem. Starts with "cstitem_".</param>
         /// <returns>CustomsItem instance.</returns>
-        public CustomsItem GetCustomsItem(
+        public async Task<CustomsItem> GetCustomsItem(
             string id)
         {
             var request = new EasyPostRequest("customs_items/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<CustomsItem>(request);
+            return await Execute<CustomsItem>(request);
         }
 
         /// <summary>
@@ -77,17 +78,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="customsItem">Customs item parameters</param>
         /// <returns>EasyPost.CustomsItem instance.</returns>
-        public CustomsItem CreateCustomsItem(
+        public async Task<CustomsItem> CreateCustomsItem(
             CustomsItem customsItem)
         {
-            if (customsItem.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("customs_items", Method.POST);
             request.AddBody(customsItem.AsDictionary(), "customs_item");
 
-            return Execute<CustomsItem>(request);
+            return await Execute<CustomsItem>(request);
         }
     }
 }

@@ -7,6 +7,7 @@
  */
 
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -84,13 +85,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Order. Starts with "order_" if passing an id.</param>
         /// <returns>Order instance.</returns>
-        public Order GetOrder(
+        public async Task<Order> GetOrder(
             string id)
         {
             var request = new EasyPostRequest("orders/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Order>(request);
+            return await Execute<Order>(request);
         }
 
         /// <summary>
@@ -98,17 +99,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="order">Order details</param>
         /// <returns>Order instance.</returns>
-        public Order CreateOrder(
+        public async Task<Order> CreateOrder(
             Order order)
         {
-            if (order.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("orders", Method.POST);
             request.AddBody(order.AsDictionary(), "order");
 
-            return Execute<Order>(request);
+            return await Execute<Order>(request);
         }
 
         /// <summary>
@@ -118,7 +115,7 @@ namespace EasyPost
         /// <param name="carrier">The carrier to purchase a shipment from.</param>
         /// <param name="service">The service to purchase.</param>
         /// <returns>Order instance.</returns>
-        public Order BuyOrder(
+        public async Task<Order> BuyOrder(
             string id,
             string carrier,
             string service)
@@ -130,7 +127,7 @@ namespace EasyPost
                 new KeyValuePair<string, string>("service", service)
             });
 
-            return Execute<Order>(request);
+            return await Execute<Order>(request);
         }
 
         /// <summary>
@@ -139,11 +136,11 @@ namespace EasyPost
         /// <param name="id">Order id to buy</param>
         /// <param name="rate">Rate object to puchase the shipment with.</param>
         /// <returns>Order instance.</returns>
-        public Order BuyOrder(
+        public async Task<Order> BuyOrder(
             string id,
             CarrierRate rate)
         {
-            return BuyOrder(id, rate.Carrier, rate.Service);
+            return await BuyOrder(id, rate.Carrier, rate.Service);
         }
     }
 }

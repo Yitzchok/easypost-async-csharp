@@ -38,9 +38,9 @@ namespace EasyPostTest
                         OriginCountry = "US",
                     },
                 },
-            });
+            }).Result;
 
-            var retrieved = _client.GetCustomsInfo(info.Id);
+            var retrieved = _client.GetCustomsInfo(info.Id).Result;
             Assert.AreEqual(info.Id, retrieved.Id);
             Assert.IsNotNull(retrieved.CustomsItems);
         }

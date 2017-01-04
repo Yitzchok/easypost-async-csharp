@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -101,13 +102,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing an Address. Starts with "adr_".</param>
         /// <returns>EasyPost.Address instance.</returns>
-        public Address GetAddress(
+        public async Task<Address> GetAddress(
             string id)
         {
             var request = new EasyPostRequest("addresses/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Address>(request);
+            return await Execute<Address>(request);
         }
 
         /// <summary>
@@ -118,14 +119,10 @@ namespace EasyPost
         /// extended zip4 value. If you use the strict versions an HttpException to be raised if unsucessful. 
         /// </param>
         /// <returns>Address instance.</returns>
-        public Address CreateAddress(
+        public async Task<Address> CreateAddress(
             Address address,
             VerificationFlags verify = VerificationFlags.None)
         {
-            if (address.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("addresses", Method.POST);
             request.AddBody(address.AsDictionary(), "address");
 
@@ -142,19 +139,19 @@ namespace EasyPost
                 request.AddParameter("verify_strict[]", "zip4", ParameterType.QueryString);
             }
 
-            return Execute<Address>(request);
+            return await Execute<Address>(request);
         }
 
         /// <summary>
         /// Verify an address.
         /// </summary>
         /// <returns>Address instance. Check message for verification failures.</returns>
-        public Address VerifyAddress(
+        public async Task<Address> VerifyAddress(
             Address address,
             string carrier = null)
         {
             if (address.Id == null) {
-                address = CreateAddress(address);
+                address = await CreateAddress(address);
             }
 
             var request = new EasyPostRequest("addresses/{id}/verify");
@@ -165,7 +162,7 @@ namespace EasyPost
                 request.AddParameter("carrier", carrier, ParameterType.QueryString);
             }
 
-            return Execute<Address>(request);
+            return await Execute<Address>(request);
         }
     }
 }

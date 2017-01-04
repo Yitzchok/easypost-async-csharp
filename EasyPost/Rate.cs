@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Threading.Tasks;
 
 namespace EasyPost
 {
@@ -94,13 +95,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Rate. Starts with "rate_".</param>
         /// <returns>CarrierRate instance.</returns>
-        public CarrierRate GetRate(
+        public async Task<CarrierRate> GetRate(
             string id)
         {
             var request = new EasyPostRequest("rates/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<CarrierRate>(request);
+            return await Execute<CarrierRate>(request);
         }
     }
 }

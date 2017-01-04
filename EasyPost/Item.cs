@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -74,13 +75,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Item. Starts with "item_" if passing an id.</param>
         /// <returns>Item instance.</returns>
-        public Item GetItem(
+        public async Task<Item> GetItem(
             string id)
         {
             var request = new EasyPostRequest("items/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Item>(request);
+            return await Execute<Item>(request);
         }
 
         /// <summary>
@@ -88,17 +89,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="item">Item to create</param>
         /// <returns>EasyPost.Item instance.</returns>
-        public Item CreateItem(
+        public async Task<Item> CreateItem(
             Item item)
         {
-            if (item.Id != null) {
-                throw new ResourceAlreadyCreated();
-            }
-
             var request = new EasyPostRequest("items", Method.POST);
             request.AddBody(item.AsDictionary(), "item");
 
-            return Execute<Item>(request);
+            return await Execute<Item>(request);
         }
 
         /// <summary>
@@ -107,7 +104,7 @@ namespace EasyPost
         /// <param name="name">String containing the name of the custom reference to search for.</param>
         /// <param name="value">String containing the value of the custom reference to search for.</param>
         /// <returns>Item instance.</returns>
-        public Item GetItemByReference(
+        public async Task<Item> GetItemByReference(
             string name,
             string value)
         {
@@ -115,7 +112,7 @@ namespace EasyPost
             request.AddUrlSegment("name", name);
             request.AddUrlSegment("value", value);
 
-            return Execute<Item>(request);
+            return await Execute<Item>(request);
         }
     }
 }

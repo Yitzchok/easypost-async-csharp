@@ -25,7 +25,7 @@ namespace EasyPostTest
         [TestMethod]
         public void TestRetrieve()
         {
-            var account = _client.GetCarrierAccount("ca_7c7X1XzO");
+            var account = _client.GetCarrierAccount("ca_7c7X1XzO").Result;
             Assert.AreEqual("ca_7c7X1XzO", account.Id);
         }
 
@@ -35,27 +35,26 @@ namespace EasyPostTest
             var account = _client.CreateCarrierAccount(new CarrierAccount {
                 Type = "EndiciaAccount",
                 Description = "description",
-            });
+            }).Result;
 
             Assert.IsNotNull(account.Id);
             Assert.AreEqual(account.Type, "EndiciaAccount");
 
             account.Reference = "new-reference";
-            account = _client.UpdateCarrierAccount(account);
+            account = _client.UpdateCarrierAccount(account).Result;
             Assert.AreEqual("new-reference", account.Reference);
 
-            _client.DestroyCarrierAccount(account.Id);
-            try {
-                _client.GetCarrierAccount(account.Id);
-                Assert.Fail();
-            } catch (HttpException) {
-            }
+            _client.DestroyCarrierAccount(account.Id).Wait();
+
+            account = _client.GetCarrierAccount(account.Id).Result;
+            Assert.IsNotNull(account.RequestError);
+            Assert.AreEqual(account.RequestError.Code, "NOT_FOUND");
         }
 
         [TestMethod]
         public void TestList()
         {
-            var accounts = _client.ListCarrierAccounts();
+            var accounts = _client.ListCarrierAccounts().Result;
             Assert.AreEqual(accounts[0].Id, "ca_7c7X1XzO");
         }
     }

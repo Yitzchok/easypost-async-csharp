@@ -11,20 +11,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
 using RestSharp;
+using RestSharp.Deserializers;
 
 namespace EasyPost
 {
     public partial class EasyPostClient : IEasyPostClient
     {
-        internal RestClient RestClient;
-        internal ClientConfiguration Configuration;
-
-        /// <summary>
-        /// Version of the EasyPost client API
-        /// </summary>
-        public string Version;
+        internal readonly RestClient RestClient;
+        internal readonly ClientConfiguration Configuration;
+        internal readonly string Version;
 
         /// <summary>
         /// Create a new EasyPost client
@@ -43,10 +40,10 @@ namespace EasyPost
         public EasyPostClient(
             ClientConfiguration clientConfiguration)
         {
-            if (clientConfiguration == null)
+            if (clientConfiguration == null) {
                 throw new ArgumentNullException(nameof(clientConfiguration));
+            }
             Configuration = clientConfiguration;
-
             RestClient = new RestClient(clientConfiguration.ApiBase);
 
             var assembly = Assembly.GetExecutingAssembly();
@@ -58,37 +55,51 @@ namespace EasyPost
         /// Internal function to execute a request
         /// </summary>
         /// <param name="request">EasyPost request to execute</param>
-        private void Execute(
+        private Task<IRestResponse> Execute(
             EasyPostRequest request)
         {
-            RestClient.Execute(PrepareRequest(request));
+            return RestClient.ExecuteTaskAsync(PrepareRequest(request));
         }
 
         /// <summary>
         /// Internal function to execute a typed request
         /// </summary>
-        /// <typeparam name="T">Type of the JSON response we are expecting</typeparam>
+        /// <typeparam name="TResponse">Type of the JSON response we are expecting</typeparam>
         /// <param name="request">EasyPost request to execute</param>
         /// <returns>Response for the request</returns>
-        private T Execute<T>(
-            EasyPostRequest request) where T : new()
+        private async Task<TResponse> Execute<TResponse>(
+            EasyPostRequest request) where TResponse : new()
         {
-            var response = RestClient.Execute<T>(PrepareRequest(request));
+            var response = await RestClient.ExecuteTaskAsync<TResponse>(PrepareRequest(request));
             var statusCode = response.StatusCode;
+            var data = response.Data;
 
             if (statusCode >= HttpStatusCode.BadRequest) {
-                string message, details;
-                try {
-                    var body = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(response.Content);
-                    message = (string)body["error"]["message"];
-                    details = (string)body["error"]["code"];
-                } catch {
-                    throw new HttpException(statusCode, "RESPONSE.PARSE_ERROR", response.Content);
+                // Bail early if this is not an EasyPost object
+                var result = data as EasyPostObject;
+                if (result == null) {
+                    return default(TResponse);
                 }
-                throw new HttpException(statusCode, message, details);
+
+                // Try to parse any generic EasyPost request errors first
+                var deserializer = new JsonDeserializer {
+                    RootElement = "error",
+                };
+                var requestError = deserializer.Deserialize<RequestError>(response);
+                if (requestError.Code == null) {
+                    // Can't make sense of the error so return a general one
+                    requestError = new RequestError {
+                        Code = "RESPONSE.PARSE_ERROR",
+                        Message = "Unknown request error or unable to parse response",
+                        Errors = new List<Error>(),
+                    };
+                }
+                requestError.StatusCode = statusCode;
+                requestError.Content = response.Content;
+                result.RequestError = requestError;
             }
 
-            return response.Data;
+            return data;
         }
 
         /// <summary>

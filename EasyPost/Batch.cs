@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace EasyPost
@@ -64,13 +65,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Batch. Starts with "batch_".</param>
         /// <returns>Batch instance.</returns>
-        public Batch GetBatch(
+        public async Task<Batch> GetBatch(
             string id)
         {
             var request = new EasyPostRequest("batches/{id}");
             request.AddUrlSegment("id", id);
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -79,7 +80,7 @@ namespace EasyPost
         /// <param name="shipments">Optional list of shipments</param>
         /// <param name="reference">Optional reference</param>
         /// <returns>EasyPost.Batch instance.</returns>
-        public Batch CreateBatch(
+        public async Task<Batch> CreateBatch(
             IEnumerable<Shipment> shipments = null, 
             string reference = null)
         {
@@ -93,7 +94,7 @@ namespace EasyPost
             }
             request.AddBody(parameters, "batch");
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -102,7 +103,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipmentIds">List of shipment ids to be added.</param>
         /// <returns>Batch instance.</returns>
-        public Batch AddShipmentsToBatch(
+        public async Task<Batch> AddShipmentsToBatch(
             string id,
             IEnumerable<string> shipmentIds)
         {
@@ -112,7 +113,7 @@ namespace EasyPost
             var body = shipmentIds.Select(shipmentId => new Dictionary<string, object> { { "id", shipmentId } }).ToList();
             request.AddBody(body, "shipments");
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -121,11 +122,11 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipments">List of Shipment objects to be added.</param>
         /// <returns>Batch instance.</returns>
-        public Batch AddShipmentsToBatch(
+        public async Task<Batch> AddShipmentsToBatch(
             string id,
             IEnumerable<Shipment> shipments)
         {
-            return AddShipmentsToBatch(id, shipments.Select(shipment => shipment.Id));
+            return await AddShipmentsToBatch(id, shipments.Select(shipment => shipment.Id));
         }
 
         /// <summary>
@@ -134,7 +135,7 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipmentIds">List of shipment ids to be removed.</param>
         /// <returns>Batch instance.</returns>
-        public Batch RemoveShipmentsFromBatch(
+        public async Task<Batch> RemoveShipmentsFromBatch(
             string id,
             IEnumerable<string> shipmentIds)
         {
@@ -144,7 +145,7 @@ namespace EasyPost
             var body = shipmentIds.Select(shipmentId => new Dictionary<string, object> { { "id", shipmentId } }).ToList();
             request.AddBody(body, "shipments");
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -153,11 +154,11 @@ namespace EasyPost
         /// <param name="id">Batch id to add the shipments to</param>
         /// <param name="shipments">List of Shipment objects to be removed.</param>
         /// <returns>Batch instance.</returns>
-        public Batch RemoveShipmentsFromBatch(
+        public async Task<Batch> RemoveShipmentsFromBatch(
             string id,
             IEnumerable<Shipment> shipments)
         {
-            return RemoveShipmentsFromBatch(id, shipments.Select(shipment => shipment.Id));
+            return await RemoveShipmentsFromBatch(id, shipments.Select(shipment => shipment.Id));
         }
 
         /// <summary>
@@ -165,13 +166,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Batch id to add the shipments to</param>
         /// <returns>Batch instance.</returns>
-        public Batch BuyLabelsForBatch(
+        public async Task<Batch> BuyLabelsForBatch(
             string id)
         {
             var request = new EasyPostRequest("batches/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -181,7 +182,7 @@ namespace EasyPost
         /// <param name="fileFormat">Format to generate the label in. Valid formats: "pdf", "zpl" and "epl2".</param>
         /// <param name="orderBy">Optional parameter to order the generated label. Ex: "reference DESC"</param>
         /// <returns>Batch instance.</returns>
-        public Batch GenerateLabelForBatch(
+        public async Task<Batch> GenerateLabelForBatch(
             string id,
             string fileFormat,
             string orderBy = null)
@@ -197,7 +198,7 @@ namespace EasyPost
             }
             request.AddBody(body);
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
 
         /// <summary>
@@ -205,13 +206,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">Batch id to generate the label for</param>
         /// <returns>Batch instance.</returns>
-        public Batch GenerateScanFormForBatch(
+        public async Task<Batch> GenerateScanFormForBatch(
             string id)
         {
             var request = new EasyPostRequest("batches/{id}/scan_form", Method.POST);
             request.AddUrlSegment("id", id);
 
-            return Execute<Batch>(request);
+            return await Execute<Batch>(request);
         }
     }
 }

@@ -25,7 +25,7 @@ namespace EasyPostTest
         [TestMethod]
         public void TestListCarrierTypes()
         {
-            var types = _client.ListCarrierTypes();
+            var types = _client.ListCarrierTypes().Result;
             Assert.AreNotEqual(0, types.Count);
         }
     }

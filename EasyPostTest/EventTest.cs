@@ -25,7 +25,7 @@ namespace EasyPostTest
         [TestMethod]
         public void TestRetrieve()
         {
-            var e = _client.GetEvent("evt_8ff440c1bcef40c6a825171d190c3bdb");
+            var e = _client.GetEvent("evt_8ff440c1bcef40c6a825171d190c3bdb").Result;
             Assert.AreEqual(e.Result["id"], "sf_8b4c8eb46fa0459e9e7be9f2e784da03");
         }
     }
