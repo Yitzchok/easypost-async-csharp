@@ -36,6 +36,18 @@ namespace EasyPost
         /// <summary>
         /// Create a new EasyPost client
         /// </summary>
+        /// <param name="apiKey">API key to use</param>
+        /// <param name="timeout">The timeout to use for client operations. 0 for the default.</param>
+        public EasyPostClient(
+            string apiKey,
+            int timeout)
+            : this(new ClientConfiguration(apiKey, timeout))
+        {
+        }
+
+        /// <summary>
+        /// Create a new EasyPost client
+        /// </summary>
         /// <param name="clientConfiguration">Client configuration to use</param>
         public EasyPostClient(
             ClientConfiguration clientConfiguration)
@@ -45,6 +57,9 @@ namespace EasyPost
             }
             Configuration = clientConfiguration;
             RestClient = new RestClient(clientConfiguration.ApiBase);
+            if (clientConfiguration.Timeout > 0) {
+                RestClient.Timeout = clientConfiguration.Timeout;
+            }
 
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -74,25 +89,36 @@ namespace EasyPost
             var statusCode = response.StatusCode;
             var data = response.Data;
 
-            if (statusCode >= HttpStatusCode.BadRequest) {
+            if (data == null || statusCode >= HttpStatusCode.BadRequest) {
                 // Bail early if this is not an EasyPost object
                 var result = data as EasyPostObject;
+                RequestError requestError;
                 if (result == null) {
-                    return default(TResponse);
-                }
-
-                // Try to parse any generic EasyPost request errors first
-                var deserializer = new JsonDeserializer {
-                    RootElement = "error",
-                };
-                var requestError = deserializer.Deserialize<RequestError>(response);
-                if (requestError.Code == null) {
-                    // Can't make sense of the error so return a general one
+                    // Return the RestSharp error message if we can
+                    data = new TResponse();
+                    result = data as EasyPostObject;
+                    if (response.ErrorMessage == null || result == null) {
+                        return default(TResponse);
+                    }
                     requestError = new RequestError {
-                        Code = "RESPONSE.PARSE_ERROR",
-                        Message = "Unknown request error or unable to parse response",
+                        Code = "RESPONSE.ERROR",
+                        Message = response.ErrorMessage,
                         Errors = new List<Error>(),
                     };
+                } else {
+                    // Try to parse any generic EasyPost request errors first
+                    var deserializer = new JsonDeserializer {
+                        RootElement = "error",
+                    };
+                    requestError = deserializer.Deserialize<RequestError>(response);
+                    if (requestError.Code == null) {
+                        // Can't make sense of the error so return a general one
+                        requestError = new RequestError {
+                            Code = "RESPONSE.PARSE_ERROR",
+                            Message = "Unknown request error or unable to parse response",
+                            Errors = new List<Error>(),
+                        };
+                    }
                 }
                 requestError.StatusCode = statusCode;
                 requestError.Content = response.Content;

@@ -29,7 +29,7 @@ namespace EasyPost
         public double? Height { get; set; }
 
         /// <summary>
-        /// Always required
+        /// Always required and defined in oz
         /// </summary>
         public double Weight { get; set; }
 
