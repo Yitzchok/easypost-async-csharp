@@ -14,17 +14,17 @@ namespace EasyPost
     public class Parcel : EasyPostObject
     {
         /// <summary>
-        /// Required if predefined_package is empty
+        /// Required if predefined_package is empty and defined in inches
         /// </summary>
         public double? Length { get; set; }
 
         /// <summary>
-        /// Required if predefined_package is empty
+        /// Required if predefined_package is empty and defined in inches
         /// </summary>
         public double? Width { get; set; }
 
         /// <summary>
-        /// Required if predefined_package is empty
+        /// Required if predefined_package is empty and defined in inches
         /// </summary>
         public double? Height { get; set; }
 

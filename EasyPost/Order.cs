@@ -55,7 +55,7 @@ namespace EasyPost
         public bool? IsReturn { get; set; }
 
         /// <summary>
-        /// Customer information
+        /// Customs information
         /// </summary>
         public CustomsInfo CustomsInfo { get; set; }
 
