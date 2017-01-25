@@ -13,6 +13,11 @@ namespace EasyPost
 {
     public interface IEasyPostClient
     {
+        /// <summary>
+        /// True if the requests should be executed using non-async code for backwards compatibility
+        /// </summary>
+        bool ExecuteNonAsync { get; set; }
+
         #region Address
 
         /// <summary>

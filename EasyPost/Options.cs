@@ -276,7 +276,7 @@ namespace EasyPost
         /// <summary>
         /// Carrier insurance amount
         /// </summary>
-        public string CarrierInsuranceAmount { get; set; }
+        public double? CarrierInsuranceAmount { get; set; }
 
         /// <summary>
         /// Carrier notification email

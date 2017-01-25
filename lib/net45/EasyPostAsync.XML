@@ -438,6 +438,11 @@
             <param name="apiKey">API key to use</param>
             <param name="timeout">The timeout to use for client operations. 0 for the default.</param>
         </member>
+        <member name="P:EasyPost.EasyPostClient.ExecuteNonAsync">
+            <summary>
+            True if the requests should be executed using non-async code for backwards compatibility
+            </summary>
+        </member>
         <member name="M:EasyPost.EasyPostClient.#ctor(EasyPost.ClientConfiguration)">
             <summary>
             Create a new EasyPost client
@@ -835,6 +840,11 @@
         <member name="P:EasyPost.RequestError.Content">
             <summary>
             Raw response content
+            </summary>
+        </member>
+        <member name="P:EasyPost.IEasyPostClient.ExecuteNonAsync">
+            <summary>
+            True if the requests should be executed using non-async code for backwards compatibility
             </summary>
         </member>
         <member name="M:EasyPost.IEasyPostClient.GetAddress(System.String)">
@@ -2116,7 +2126,7 @@
         </member>
         <member name="P:EasyPost.Order.CustomsInfo">
             <summary>
-            Customer information
+            Customs information
             </summary>
         </member>
         <member name="P:EasyPost.Order.CarrierAccounts">
@@ -2307,17 +2317,17 @@
         </member>
         <member name="P:EasyPost.Parcel.Length">
             <summary>
-            Required if predefined_package is empty
+            Required if predefined_package is empty and defined in inches
             </summary>
         </member>
         <member name="P:EasyPost.Parcel.Width">
             <summary>
-            Required if predefined_package is empty
+            Required if predefined_package is empty and defined in inches
             </summary>
         </member>
         <member name="P:EasyPost.Parcel.Height">
             <summary>
-            Required if predefined_package is empty
+            Required if predefined_package is empty and defined in inches
             </summary>
         </member>
         <member name="P:EasyPost.Parcel.Weight">

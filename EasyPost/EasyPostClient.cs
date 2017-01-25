@@ -46,6 +46,11 @@ namespace EasyPost
         }
 
         /// <summary>
+        /// True if the requests should be executed using non-async code for backwards compatibility
+        /// </summary>
+        public bool ExecuteNonAsync { get; set; }
+
+        /// <summary>
         /// Create a new EasyPost client
         /// </summary>
         /// <param name="clientConfiguration">Client configuration to use</param>
@@ -85,7 +90,12 @@ namespace EasyPost
         private async Task<TResponse> Execute<TResponse>(
             EasyPostRequest request) where TResponse : new()
         {
-            var response = await RestClient.ExecuteTaskAsync<TResponse>(PrepareRequest(request));
+            IRestResponse<TResponse> response;
+            if (ExecuteNonAsync) {
+                response = RestClient.Execute<TResponse>(PrepareRequest(request));
+            } else {
+                response = await RestClient.ExecuteTaskAsync<TResponse>(PrepareRequest(request));
+            }
             var statusCode = response.StatusCode;
             var data = response.Data;
 
