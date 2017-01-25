@@ -172,8 +172,11 @@ namespace EasyPost
                         result.AddRange(FlattenParameters(list[i], string.Concat(parent, "[", pair.Key, "][", i, "]")));
                     }
                 } else if (pair.Value is DateTime) {
+                    // Force the date time to be UTC over the wire. Even though the docs say it should handle time 
+                    // zone offsets, it does not appear to do that.
+                    var dateTime = ((DateTime)pair.Value).ToUniversalTime();
                     result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "]"),
-                        Convert.ToString(((DateTime)pair.Value).ToString("yyyy-MM-ddTHH:mm:sszzz"))));
+                        Convert.ToString(dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"))));
                 } else if (pair.Value != null) {
                     result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "]"), pair.Value.ToString()));
                 }
