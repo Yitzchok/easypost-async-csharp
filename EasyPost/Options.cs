@@ -176,35 +176,36 @@ namespace EasyPost
         /// </summary>
         public bool? Machinable { get; set; }
 
+        // ReSharper disable InconsistentNaming
         /// <summary>
         /// You can optionally print custom messages on labels. The locations of these fields show up on different spots on the carrier's labels.
         /// </summary>
-        public string PrintCustom1 { get; set; }
+        public string PrintCustom_1 { get; set; }
 
         /// <summary>
         /// An additional message on the label. Same restrictions as print_custom_1
         /// </summary>
-        public string PrintCustom2 { get; set; }
+        public string PrintCustom_2 { get; set; }
 
         /// <summary>
         /// An additional message on the label. Same restrictions as print_custom_1
         /// </summary>
-        public string PrintCustom3 { get; set; }
+        public string PrintCustom_3 { get; set; }
 
         /// <summary>
         /// Create a barcode for this custom reference if supported by carrier.
         /// </summary>
-        public bool? PrintCustom1Barcode { get; set; }
+        public bool? PrintCustom_1Barcode { get; set; }
 
         /// <summary>
         /// Create a barcode for this custom reference if supported by carrier.
         /// </summary>
-        public bool? PrintCustom2Barcode { get; set; }
+        public bool? PrintCustom_2Barcode { get; set; }
 
         /// <summary>
         /// Create a barcode for this custom reference if supported by carrier.
         /// </summary>
-        public bool? PrintCustom3Barcode { get; set; }
+        public bool? PrintCustom_3Barcode { get; set; }
 
         /// <summary>
         /// Specify the type of print_custom_1.
@@ -238,17 +239,18 @@ namespace EasyPost
         /// . TJ - Federal Taxpayer ID No.
         /// . SY - Social Security Number
         /// </summary>
-        public string PrintCustom1Code { get; set; }
+        public string PrintCustom_1Code { get; set; }
 
         /// <summary>
         /// See print_custom_1_code.
         /// </summary>
-        public string PrintCustom2Code { get; set; }
+        public string PrintCustom_2Code { get; set; }
 
         /// <summary>
         /// See print_custom_1_code.
         /// </summary>
-        public string PrintCustom3Code { get; set; }
+        public string PrintCustom_3Code { get; set; }
+        // ReSharper restore InconsistentNaming
 
         /// <summary>
         /// Set this value to true for delivery on Saturday. When setting the saturday_delivery option, you will only get 

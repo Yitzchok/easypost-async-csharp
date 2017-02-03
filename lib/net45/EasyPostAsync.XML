@@ -1510,37 +1510,37 @@
             Whether or not the parcel can be processed by the carriers equipment.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom1">
+        <member name="P:EasyPost.Options.PrintCustom_1">
             <summary>
             You can optionally print custom messages on labels. The locations of these fields show up on different spots on the carrier's labels.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom2">
+        <member name="P:EasyPost.Options.PrintCustom_2">
             <summary>
             An additional message on the label. Same restrictions as print_custom_1
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom3">
+        <member name="P:EasyPost.Options.PrintCustom_3">
             <summary>
             An additional message on the label. Same restrictions as print_custom_1
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom1Barcode">
+        <member name="P:EasyPost.Options.PrintCustom_1Barcode">
             <summary>
             Create a barcode for this custom reference if supported by carrier.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom2Barcode">
+        <member name="P:EasyPost.Options.PrintCustom_2Barcode">
             <summary>
             Create a barcode for this custom reference if supported by carrier.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom3Barcode">
+        <member name="P:EasyPost.Options.PrintCustom_3Barcode">
             <summary>
             Create a barcode for this custom reference if supported by carrier.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom1Code">
+        <member name="P:EasyPost.Options.PrintCustom_1Code">
             <summary>
             Specify the type of print_custom_1.
             FedEx
@@ -1574,12 +1574,12 @@
             . SY - Social Security Number
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom2Code">
+        <member name="P:EasyPost.Options.PrintCustom_2Code">
             <summary>
             See print_custom_1_code.
             </summary>
         </member>
-        <member name="P:EasyPost.Options.PrintCustom3Code">
+        <member name="P:EasyPost.Options.PrintCustom_3Code">
             <summary>
             See print_custom_1_code.
             </summary>
