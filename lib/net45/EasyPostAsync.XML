@@ -1622,6 +1622,11 @@
             Carrier notification SMS
             </summary>
         </member>
+        <member name="P:EasyPost.Options.CarrierBranded">
+            <summary>
+            Carrier branded labels
+            </summary>
+        </member>
         <member name="P:EasyPost.Options.CommercialInvoiceFormat">
             <summary>
             Commercial invoice format

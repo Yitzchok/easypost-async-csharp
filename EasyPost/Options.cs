@@ -291,6 +291,11 @@ namespace EasyPost
         public string CarrierNotificationSms { get; set; }
 
         /// <summary>
+        /// Carrier branded labels
+        /// </summary>
+        public bool? CarrierBranded { get; set; }
+
+        /// <summary>
         /// Commercial invoice format
         /// </summary>
         public string CommercialInvoiceFormat { get; set; }
