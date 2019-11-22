@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using RestSharp;
 using RestSharp.Deserializers;
+using RestSharp.Serialization.Json;
 
 namespace EasyPost
 {

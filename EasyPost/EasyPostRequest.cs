@@ -37,7 +37,7 @@ namespace EasyPost
         /// <summary>
         /// Sets the root element for the response
         /// </summary>
-        public string RootElement { get { return RestRequest.RootElement; } set { RestRequest.RootElement = value; } }
+        public string RootElement { get => RestRequest.RootElement; set => RestRequest.RootElement = value; }
 
         /// <summary>
         /// Adds a Url segment parameter to the request
@@ -80,7 +80,7 @@ namespace EasyPost
         }
 
         /// <summary>
-        /// Adds the body to the request as a dictionary of flattended parameters
+        /// Adds the body to the request as a dictionary of flattened parameters
         /// </summary>
         /// <param name="parameters">Non-flattened dictionary of parameters</param>
         /// <param name="parent">Parent object</param>
@@ -93,7 +93,7 @@ namespace EasyPost
         }
 
         /// <summary>
-        /// Adds a list of dictionarys as parameters by combining them all together
+        /// Adds a list of dictionaries as parameters by combining them all together
         /// </summary>
         /// <param name="parameters">List of parameter dictionaries</param>
         /// <param name="parent">Parent object</param>
@@ -143,7 +143,7 @@ namespace EasyPost
         /// <summary>
         /// Flattens the parameters for the request
         /// </summary>
-        /// <param name="parameters">Dictionary of parameters to flattend</param>
+        /// <param name="parameters">Dictionary of parameters to flattened</param>
         /// <param name="parent">Parent object</param>
         /// <returns>List of flattened parameters as a key value pair set</returns>
         internal List<KeyValuePair<string, string>> FlattenParameters(
@@ -171,10 +171,10 @@ namespace EasyPost
                     for (var i = 0; i < list.Count; i++) {
                         result.AddRange(FlattenParameters(list[i], string.Concat(parent, "[", pair.Key, "][", i, "]")));
                     }
-                } else if (pair.Value is DateTime) {
+                } else if (pair.Value is DateTime time) {
                     // Force the date time to be UTC over the wire. Even though the docs say it should handle time 
                     // zone offsets, it does not appear to do that.
-                    var dateTime = ((DateTime)pair.Value).ToUniversalTime();
+                    var dateTime = time.ToUniversalTime();
                     result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "]"),
                         Convert.ToString(dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"))));
                 } else if (pair.Value != null) {

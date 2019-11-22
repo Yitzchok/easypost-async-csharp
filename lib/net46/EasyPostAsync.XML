@@ -2446,14 +2446,14 @@
         </member>
         <member name="M:EasyPost.EasyPostRequest.AddBody(System.Collections.Generic.IDictionary{System.String,System.Object},System.String)">
             <summary>
-            Adds the body to the request as a dictionary of flattended parameters
+            Adds the body to the request as a dictionary of flattened parameters
             </summary>
             <param name="parameters">Non-flattened dictionary of parameters</param>
             <param name="parent">Parent object</param>
         </member>
         <member name="M:EasyPost.EasyPostRequest.AddBody(System.Collections.Generic.List{System.Collections.Generic.Dictionary{System.String,System.Object}},System.String)">
             <summary>
-            Adds a list of dictionarys as parameters by combining them all together
+            Adds a list of dictionaries as parameters by combining them all together
             </summary>
             <param name="parameters">List of parameter dictionaries</param>
             <param name="parent">Parent object</param>
@@ -2482,7 +2482,7 @@
             <summary>
             Flattens the parameters for the request
             </summary>
-            <param name="parameters">Dictionary of parameters to flattend</param>
+            <param name="parameters">Dictionary of parameters to flattened</param>
             <param name="parent">Parent object</param>
             <returns>List of flattened parameters as a key value pair set</returns>
         </member>
