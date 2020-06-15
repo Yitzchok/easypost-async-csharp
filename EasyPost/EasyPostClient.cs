@@ -58,6 +58,8 @@ namespace EasyPost
         public EasyPostClient(
             ClientConfiguration clientConfiguration)
         {
+            System.Net.ServicePointManager.SecurityProtocol |= Security.GetProtocol();
+
             if (clientConfiguration == null) {
                 throw new ArgumentNullException(nameof(clientConfiguration));
             }
