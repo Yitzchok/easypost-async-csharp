@@ -2,7 +2,8 @@
 
 [![NuGet version (EasyPostAsync)](https://img.shields.io/nuget/v/EasyPostAsync)](https://www.nuget.org/packages/EasyPostAsync/)
 
-EasyPost Async is a simple shipping API using the .net 4.5 Task Async API. You can sign up for an account at https://easypost.com
+EasyPost Async is a simple shipping API using the .net Task-based asynchronous pattern (TAP). You can sign up for an account at https://easypost.com
+
 This is a fork of https://github.com/kendallb/easypost-async-csharp
 
 ## Documentation
@@ -11,10 +12,21 @@ Up-to-date documentation at: https://www.easypost.com/docs/api/csharp
 
 ## Installation
 
-Install EasyPost Async to your project is with the NuGet package manager.
+Install EasyPostAsync using NuGet package manager.
 
+Package Manager
 ```
 Install-Package EasyPostAsync
+```
+
+.NET CLI
+```
+dotnet add package EasyPostAsync
+```
+
+PackageReference
+```
+<PackageReference Include="EasyPostAsync" Version="3.0.0" />
 ```
 
 See NuGet docs for instructions on installing via the [dialog](http://docs.nuget.org/docs/start-here/managing-nuget-packages-using-the-dialog) or the [console](http://docs.nuget.org/docs/start-here/using-the-package-manager-console).
