@@ -20,7 +20,6 @@ namespace EasyPost
     public partial class EasyPostClient : IEasyPostClient
     {
         internal readonly IHttpClient RestClient;
-        internal readonly ClientConfiguration Configuration;
         internal readonly string Version;
 
         /// <summary>
@@ -59,14 +58,7 @@ namespace EasyPost
         {
             System.Net.ServicePointManager.SecurityProtocol |= Security.GetProtocol();
 
-            if (clientConfiguration == null) {
-                throw new ArgumentNullException(nameof(clientConfiguration));
-            }
-            Configuration = clientConfiguration;
-            RestClient = new RestSharpHttpClient(new RestClient(clientConfiguration.ApiBase));
-            if (clientConfiguration.Timeout > 0) {
-                RestClient.Timeout = clientConfiguration.Timeout;
-            }
+            RestClient = new RestSharpHttpClient(clientConfiguration);
 
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
@@ -141,19 +133,16 @@ namespace EasyPost
         }
 
         /// <summary>
-        /// Internal function to prepate the request to be executed
+        /// Internal function to prepare the request to be executed
         /// </summary>
         /// <param name="request">EasyPost request to be executed</param>
         /// <returns>RestSharp request to execute</returns>
         internal RestRequest PrepareRequest(
             EasyPostRequest request)
         {
-            var restRequest = request.RestRequest;
-
+            var restRequest = RestClient.AddAuthorizationToRequest(request);
             restRequest.AddHeader("user_agent", string.Concat("EasyPost/CSharpASync/", Version));
-            restRequest.AddHeader("authorization", "Bearer " + Configuration.ApiKey);
             restRequest.AddHeader("content_type", "application/x-www-form-urlencoded");
-
             return restRequest;
         }
     }

@@ -12,5 +12,7 @@ namespace EasyPost
         Task<IRestResponse> ExecuteTaskAsync(RestRequest request);
         Task<IRestResponse<TResponse>> ExecuteTaskAsync<TResponse>(RestRequest request) where TResponse : new();
         IRestResponse<TResponse> Execute<TResponse>(RestRequest request) where TResponse : new();
+
+        RestRequest AddAuthorizationToRequest(EasyPostRequest request);
     }
 }
