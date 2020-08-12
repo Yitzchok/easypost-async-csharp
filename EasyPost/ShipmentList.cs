@@ -34,12 +34,12 @@ namespace EasyPost
         /// </summary>
         /// <param name="client">Easy post client to use</param>
         /// <returns>A new ShipmentList instance.</returns>
-        public async Task<ShipmentList> Next(
+        public Task<ShipmentList> Next(
             IEasyPostClient client)
         {
             var options = Options ?? new ShipmentListOptions();
             options.BeforeId = Shipments.Last().Id;
-            return await client.ListShipments(options);
+            return client.ListShipments(options);
         }
     }
 }
