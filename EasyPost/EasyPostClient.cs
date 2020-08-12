@@ -55,14 +55,32 @@ namespace EasyPost
         /// <param name="clientConfiguration">Client configuration to use</param>
         public EasyPostClient(
             ClientConfiguration clientConfiguration)
+            : this(new RestSharpHttpClient(clientConfiguration))
+        {
+        }
+
+        /// <summary>
+        /// Create a new EasyPost client
+        /// </summary>
+        /// <param name="client">Configured Http Client</param>
+        public EasyPostClient(IHttpClient client)
         {
             System.Net.ServicePointManager.SecurityProtocol |= Security.GetProtocol();
 
-            RestClient = new RestSharpHttpClient(clientConfiguration);
+            RestClient = client;
 
+            Version = GetAssemblyFileVersion();
+        }
+
+        /// <summary>
+        /// Gets the Executing Assembly file version
+        /// </summary>
+        /// <returns></returns>
+        private string GetAssemblyFileVersion()
+        {
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-            Version = info.FileVersion;
+            return info.FileVersion;
         }
 
         /// <summary>
