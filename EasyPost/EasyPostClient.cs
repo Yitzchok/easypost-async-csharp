@@ -13,14 +13,13 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using RestSharp;
-using RestSharp.Deserializers;
 using RestSharp.Serialization.Json;
 
 namespace EasyPost
 {
     public partial class EasyPostClient : IEasyPostClient
     {
-        internal readonly RestClient RestClient;
+        internal readonly IRestClient RestClient;
         internal readonly ClientConfiguration Configuration;
         internal readonly string Version;
 
