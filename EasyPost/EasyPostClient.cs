@@ -19,7 +19,7 @@ namespace EasyPost
 {
     public partial class EasyPostClient : IEasyPostClient
     {
-        internal readonly IRestClient RestClient;
+        internal readonly IHttpClient RestClient;
         internal readonly ClientConfiguration Configuration;
         internal readonly string Version;
 
@@ -63,7 +63,7 @@ namespace EasyPost
                 throw new ArgumentNullException(nameof(clientConfiguration));
             }
             Configuration = clientConfiguration;
-            RestClient = new RestClient(clientConfiguration.ApiBase);
+            RestClient = new RestSharpHttpClient(new RestClient(clientConfiguration.ApiBase));
             if (clientConfiguration.Timeout > 0) {
                 RestClient.Timeout = clientConfiguration.Timeout;
             }
