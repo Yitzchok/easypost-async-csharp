@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EasyPost;
 
@@ -213,6 +214,17 @@ namespace EasyPostTest
             var nextShipmentList = shipmentList.Next(_client).Result;
             Assert.AreNotEqual(0, nextShipmentList.Shipments.Count);
             Assert.AreNotEqual(shipmentList.Shipments[0].Id, nextShipmentList.Shipments[0].Id);
+        }
+
+        [TestMethod]
+        public async Task TestListWithOptions()
+        {
+            var shipmentList = await _client.ListShipments(new ShipmentListOptions {
+                EndDatetime = DateTime.UtcNow,
+                PageSize = 1
+            });
+
+            Assert.AreNotEqual(0, shipmentList.Shipments.Count);
         }
     }
 }
