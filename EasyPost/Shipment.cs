@@ -223,13 +223,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing a Shipment. Starts with "shp_".</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> GetShipment(
+        public Task<Shipment> GetShipment(
             string id)
         {
             var request = new EasyPostRequest("shipments/{id}");
             request.AddUrlSegment("id", id);
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
@@ -237,13 +237,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="shipment">Shipment details</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> CreateShipment(
+        public Task<Shipment> CreateShipment(
             Shipment shipment)
         {
             var request = new EasyPostRequest("shipments", Method.POST);
             request.AddBody(shipment.AsDictionary(), "shipment");
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to buy the label for</param>
         /// <param name="rateId">The id of the rate to purchase the shipment with.</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> BuyShipment(
+        public Task<Shipment> BuyShipment(
             string id,
             string rateId)
         {
@@ -274,7 +274,7 @@ namespace EasyPost
             request.AddUrlSegment("id", id);
             request.AddBody(new Dictionary<string, object> { { "id", rateId } }, "rate");
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
@@ -283,7 +283,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to buy insurance for</param>
         /// <param name="amount">The amount to insure the shipment for. Currency is provided when creating a shipment.</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> BuyInsuranceForShipment(
+        public Task<Shipment> BuyInsuranceForShipment(
             string id,
             double amount)
         {
@@ -293,7 +293,7 @@ namespace EasyPost
                 new KeyValuePair<string, string>("amount", amount.ToString())
             });
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
@@ -302,7 +302,7 @@ namespace EasyPost
         /// <param name="id">The id of the shipment to generate the label for</param>
         /// <param name="fileFormat">Format to generate the label in. Valid formats: "pdf", "zpl" and "epl2".</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> GenerateLabel(
+        public Task<Shipment> GenerateLabel(
             string id,
             string fileFormat)
         {
@@ -312,7 +312,7 @@ namespace EasyPost
             // This is a GET, but uses the request body, so use ParameterType.GetOrPost instead.
             request.AddParameter("file_format", fileFormat, ParameterType.GetOrPost);
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
 
         /// <summary>
@@ -350,13 +350,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">The id of the shipment to refund</param>
         /// <returns>Shipment instance.</returns>
-        public async Task<Shipment> RefundShipment(
+        public Task<Shipment> RefundShipment(
             string id)
         {
             var request = new EasyPostRequest("shipments/{id}/refund");
             request.AddUrlSegment("id", id);
 
-            return await Execute<Shipment>(request);
+            return Execute<Shipment>(request);
         }
     }
 }
