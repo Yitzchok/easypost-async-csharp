@@ -13,15 +13,13 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using RestSharp;
-using RestSharp.Deserializers;
 using RestSharp.Serialization.Json;
 
 namespace EasyPost
 {
     public partial class EasyPostClient : IEasyPostClient
     {
-        internal readonly RestClient RestClient;
-        internal readonly ClientConfiguration Configuration;
+        internal readonly IHttpClient RestClient;
         internal readonly string Version;
 
         /// <summary>
@@ -57,21 +55,32 @@ namespace EasyPost
         /// <param name="clientConfiguration">Client configuration to use</param>
         public EasyPostClient(
             ClientConfiguration clientConfiguration)
+            : this(new RestSharpHttpClient(clientConfiguration))
+        {
+        }
+
+        /// <summary>
+        /// Create a new EasyPost client
+        /// </summary>
+        /// <param name="client">Configured Http Client</param>
+        public EasyPostClient(IHttpClient client)
         {
             System.Net.ServicePointManager.SecurityProtocol |= Security.GetProtocol();
 
-            if (clientConfiguration == null) {
-                throw new ArgumentNullException(nameof(clientConfiguration));
-            }
-            Configuration = clientConfiguration;
-            RestClient = new RestClient(clientConfiguration.ApiBase);
-            if (clientConfiguration.Timeout > 0) {
-                RestClient.Timeout = clientConfiguration.Timeout;
-            }
+            RestClient = client;
 
+            Version = GetAssemblyFileVersion();
+        }
+
+        /// <summary>
+        /// Gets the Executing Assembly file version
+        /// </summary>
+        /// <returns></returns>
+        private string GetAssemblyFileVersion()
+        {
             var assembly = Assembly.GetExecutingAssembly();
             var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-            Version = info.FileVersion;
+            return info.FileVersion;
         }
 
         /// <summary>
@@ -142,19 +151,16 @@ namespace EasyPost
         }
 
         /// <summary>
-        /// Internal function to prepate the request to be executed
+        /// Internal function to prepare the request to be executed
         /// </summary>
         /// <param name="request">EasyPost request to be executed</param>
         /// <returns>RestSharp request to execute</returns>
         internal RestRequest PrepareRequest(
             EasyPostRequest request)
         {
-            var restRequest = request.RestRequest;
-
+            var restRequest = RestClient.AddAuthorizationToRequest(request);
             restRequest.AddHeader("user_agent", string.Concat("EasyPost/CSharpASync/", Version));
-            restRequest.AddHeader("authorization", "Bearer " + Configuration.ApiKey);
             restRequest.AddHeader("content_type", "application/x-www-form-urlencoded");
-
             return restRequest;
         }
     }

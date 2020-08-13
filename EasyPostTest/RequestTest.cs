@@ -6,6 +6,7 @@
  * All Rights Reserved
  */
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using EasyPost;
@@ -108,6 +109,44 @@ namespace EasyPostTest
             var result = request.FlattenParameters(parameters, "parent");
             CollectionAssert.Contains(result, new KeyValuePair<string, string>("parent[foo][0][bar]", "baz"));
             CollectionAssert.Contains(result, new KeyValuePair<string, string>("parent[baz]", "qux"));
+        }
+
+        [DataTestMethod]
+        [DataRow("test", "test")]
+        [DataRow(1, "1")]
+        [DataRow(-1, "-1")]
+        [DataRow(true, "True")]
+        [DataRow(false, "False")]
+        [DataRow(1.5, "1.5")]
+        public void TestAddQueryStringWithSimpleTypes(object data, string expected)
+        {
+            var parameter = AddQueryStringAndGetProcessedValue(data);
+            Assert.AreEqual(expected, parameter.Value);
+            Assert.AreEqual(ParameterType.QueryString, parameter.Type);
+        }
+
+        [TestMethod]
+        public void TestAddQueryStringWithDataTimeShouldFormatToISO8601Format()
+        {
+            var date = DateTime.UtcNow;
+         
+            var parameter = AddQueryStringAndGetProcessedValue(date);
+            
+            Assert.AreEqual(date.ToString("u"), parameter.Value);
+        }
+
+        private Parameter AddQueryStringAndGetProcessedValue(
+            object data)
+        {
+            var request = new EasyPostRequest("resource");
+            var parameters = new Dictionary<string, object> {
+                { "data", data }
+            };
+
+            request.AddQueryString(parameters);
+
+            var parameter = request.RestRequest.Parameters.Single(x => x.Name == "data");
+            return parameter;
         }
     }
 }

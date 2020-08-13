@@ -74,8 +74,18 @@ namespace EasyPost
         {
             foreach (var pair in parameters) {
                 if (pair.Value != null) {
-                    AddParameter(pair.Key, Convert.ToString(pair.Value), ParameterType.QueryString);
+                    AddParameter(pair.Key, FormatQueryStringObjectToString(pair.Value), ParameterType.QueryString);
                 }
+            }
+        }
+
+        private string FormatQueryStringObjectToString(object value)
+        {
+            switch (value) {
+                case DateTime date:
+                    return date.ToString("u");
+                default:
+                    return Convert.ToString(value);
             }
         }
 
