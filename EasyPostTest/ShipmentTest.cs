@@ -67,51 +67,54 @@ namespace EasyPostTest
             };
         }
 
-        private Shipment BuyShipment()
+        private async Task<Shipment> BuyShipment()
         {
-            var shipment = _client.CreateShipment(_testShipment).Result;
-            return _client.BuyShipment(shipment.Id, shipment.Rates[0].Id).Result;
+            var shipment = await _client.CreateShipment(_testShipment);
+            return await _client.BuyShipment(shipment.Id, shipment.Rates[0].Id);
         }
 
         [TestMethod]
-        public void TestCreateAndRetrieve()
+        public async Task TestCreateAndRetrieve()
         {
-            var shipment = _client.CreateShipment(_testShipment).Result;
+            var shipment = await _client.CreateShipment(_testShipment);
             Assert.IsNotNull(shipment.Id);
             Assert.AreEqual(shipment.Reference, "ShipmentRef");
             Assert.IsNotNull(shipment.Rates);
             Assert.AreNotEqual(shipment.Rates.Count, 0);
 
-            var retrieved = _client.GetShipment(shipment.Id).Result;
+            var retrieved = await _client.GetShipment(shipment.Id);
             Assert.AreEqual(shipment.Id, retrieved.Id);
             Assert.IsNotNull(retrieved.Rates);
             Assert.AreNotEqual(retrieved.Rates.Count, 0);
         }
 
         [TestMethod]
-        public void TestOptions()
+        public async Task TestOptions()
         {
             var tomorrow = DateTime.Now.AddDays(1);
-            _testShipment.Options = new Options {
+            _testShipment.Options = new Options
+            {
                 LabelDate = tomorrow
             };
-            var shipment = _client.CreateShipment(_testShipment).Result;
+            var shipment = await _client.CreateShipment(_testShipment);
 
             shipment.Options.LabelDate = shipment.Options.LabelDate.Value.ToLocalTime();
             Assert.AreEqual(shipment.Options.LabelDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
 
         [TestMethod]
-        public void TestRateErrorMessages()
+        public async Task TestRateErrorMessages()
         {
-            var shipment = _client.CreateShipment(new Shipment {
+            var shipment = await _client.CreateShipment(new Shipment
+            {
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
-                Parcel = new Parcel {
-                    Weight = 10,  
+                Parcel = new Parcel
+                {
+                    Weight = 10,
                     PredefinedPackage = "FEDEXBOX",
                 },
-            }).Result;
+            }).ConfigureAwait(false);
 
             Assert.IsNotNull(shipment.Id);
             Assert.AreEqual(shipment.Messages[0].Carrier, "UPS");
@@ -120,42 +123,42 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public void TestRegenerateRates()
+        public async Task TestRegenerateRates()
         {
-            var shipment = _client.CreateShipment(_testShipment).Result;
-            _client.RegenerateRates(shipment).Wait();
+            var shipment = await _client.CreateShipment(_testShipment);
+            await _client.RegenerateRates(shipment);
             Assert.IsNotNull(shipment.Id);
             Assert.IsNotNull(shipment.Rates);
         }
 
         [TestMethod]
-        public void TestCreateAndBuyPlusInsurance()
+        public async Task TestCreateAndBuyPlusInsurance()
         {
-            var shipment = _client.CreateShipment(_testShipment).Result;
+            var shipment = await _client.CreateShipment(_testShipment);
             Assert.IsNotNull(shipment.Rates);
             Assert.AreNotEqual(shipment.Rates.Count, 0);
 
-            shipment = _client.BuyShipment(shipment.Id, shipment.Rates[0].Id).Result;
+            shipment = await _client.BuyShipment(shipment.Id, shipment.Rates[0].Id);
             Assert.IsNotNull(shipment.PostageLabel);
 
-            shipment = _client.BuyInsuranceForShipment(shipment.Id, 100.1).Result;
+            shipment = await _client.BuyInsuranceForShipment(shipment.Id, 100.1);
             Assert.AreNotEqual(shipment.Insurance, 100.1);
         }
 
         [TestMethod]
-        public void TestRefund()
+        public async Task TestRefund()
         {
-            var shipment = BuyShipment();
-            shipment = _client.RefundShipment(shipment.Id).Result;
+            var shipment = await BuyShipment();
+            shipment = await _client.RefundShipment(shipment.Id);
             Assert.IsNotNull(shipment.RefundStatus);
         }
 
         [TestMethod]
-        public void TestGenerateLabelStampBarcode()
+        public async Task TestGenerateLabelStampBarcode()
         {
-            var shipment = BuyShipment();
+            var shipment =await BuyShipment();
 
-            shipment = _client.GenerateLabel(shipment.Id, "pdf").Result;
+            shipment = await _client.GenerateLabel(shipment.Id, "pdf");
             Assert.IsNotNull(shipment.PostageLabel);
 
             var url = _client.GenerateStamp(shipment.Id);
@@ -195,23 +198,24 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public void TestCarrierAccounts()
+        public async Task TestCarrierAccounts()
         {
             var shipment = _testShipment;
             shipment.CarrierAccounts = new List<CarrierAccount> { new CarrierAccount { Id = "ca_qn6QC6fd" } };
-            shipment = _client.CreateShipment(_testShipment).Result;
-            if (shipment.Rates.Count > 0) {
+            shipment = await _client.CreateShipment(_testShipment);
+            if (shipment.Rates.Count > 0)
+            {
                 Assert.IsTrue(shipment.Rates.TrueForAll(r => r.CarrierAccountId == "ca_qn6QC6fd"));
             }
         }
 
         [TestMethod]
-        public void TestList()
+        public async Task TestList()
         {
-            var shipmentList = _client.ListShipments().Result;
+            var shipmentList = await _client.ListShipments();
             Assert.AreNotEqual(0, shipmentList.Shipments.Count);
 
-            var nextShipmentList = shipmentList.Next(_client).Result;
+            var nextShipmentList = await shipmentList.Next(_client);
             Assert.AreNotEqual(0, nextShipmentList.Shipments.Count);
             Assert.AreNotEqual(shipmentList.Shipments[0].Id, nextShipmentList.Shipments[0].Id);
         }
