@@ -6,7 +6,6 @@
  * All Rights Reserved
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -103,11 +102,15 @@ namespace EasyPost
             EasyPostRequest request) where TResponse : new()
         {
             IRestResponse<TResponse> response;
+            
+            var preparedRequest = PrepareRequest(request);
+            
             if (ExecuteNonAsync) {
-                response = RestClient.Execute<TResponse>(PrepareRequest(request));
+                response = RestClient.Execute<TResponse>(preparedRequest);
             } else {
-                response = await RestClient.ExecuteTaskAsync<TResponse>(PrepareRequest(request));
+                response = await RestClient.ExecuteTaskAsync<TResponse>(preparedRequest).ConfigureAwait(false);
             }
+
             var statusCode = response.StatusCode;
             var data = response.Data;
 
