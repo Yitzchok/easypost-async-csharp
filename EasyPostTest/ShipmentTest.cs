@@ -27,7 +27,8 @@ namespace EasyPostTest
         {
             _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
 
-            _toAddress = new Address {
+            _toAddress = new Address
+            {
                 Company = "Simpler Postage Inc",
                 Street1 = "164 Townsend Street",
                 Street2 = "Unit 1",
@@ -36,7 +37,8 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94107",
             };
-            _fromAddress = new Address {
+            _fromAddress = new Address
+            {
                 Name = "Andrew Tribone",
                 Street1 = "480 Fell St",
                 Street2 = "#3",
@@ -45,17 +47,20 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94102",
             };
-            _testShipment = new Shipment {
+            _testShipment = new Shipment
+            {
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
-                Parcel = new Parcel {
+                Parcel = new Parcel
+                {
                     Length = 8,
                     Width = 6,
                     Height = 5,
                     Weight = 10,
                 },
                 Reference = "ShipmentRef",
-                CustomsInfo = new CustomsInfo {
+                CustomsInfo = new CustomsInfo
+                {
                     CustomsCertify = true,
                     EelPfc = "NOEEI 30.37(a)",
                     CustomsItems = new List<CustomsItem> {
@@ -158,7 +163,7 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestGenerateLabelStampBarcode()
         {
-            var shipment =await BuyShipment();
+            var shipment = await BuyShipment();
 
             shipment = await _client.GenerateLabel(shipment.Id, "pdf");
             Assert.IsNotNull(shipment.PostageLabel);
@@ -225,7 +230,8 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestListWithOptions()
         {
-            var shipmentList = await _client.ListShipments(new ShipmentListOptions {
+            var shipmentList = await _client.ListShipments(new ShipmentListOptions
+            {
                 EndDatetime = DateTime.UtcNow,
                 PageSize = 1
             });
