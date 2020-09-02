@@ -39,10 +39,10 @@ namespace EasyPost
         public Uri BaseUrl => restClient.BaseUrl;
 
         public Task<IRestResponse> ExecuteTaskAsync(RestRequest request) =>
-            restClient.ExecuteTaskAsync(request);
+            restClient.ExecuteAsync(request);
 
         public Task<IRestResponse<TResponse>> ExecuteTaskAsync<TResponse>(RestRequest request) where TResponse : new() =>
-            restClient.ExecuteTaskAsync<TResponse>(request);
+            restClient.ExecuteAsync<TResponse>(request);
 
         public IRestResponse<TResponse> Execute<TResponse>(RestRequest request) where TResponse : new() =>
             restClient.Execute<TResponse>(request);
