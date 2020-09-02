@@ -89,7 +89,7 @@ namespace EasyPost
         private Task<IRestResponse> Execute(
             EasyPostRequest request)
         {
-            return RestClient.ExecuteTaskAsync(PrepareRequest(request));
+            return RestClient.ExecuteAsync(PrepareRequest(request));
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace EasyPost
             if (ExecuteNonAsync) {
                 response = RestClient.Execute<TResponse>(preparedRequest);
             } else {
-                response = await RestClient.ExecuteTaskAsync<TResponse>(preparedRequest).ConfigureAwait(false);
+                response = await RestClient.ExecuteAsync<TResponse>(preparedRequest).ConfigureAwait(false);
             }
 
             var statusCode = response.StatusCode;
