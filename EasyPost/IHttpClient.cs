@@ -9,10 +9,10 @@ namespace EasyPost
         int Timeout { get; set; }
         Uri BaseUrl { get; }
 
-        Task<IRestResponse> ExecuteAsync(RestRequest request);
-        Task<IRestResponse<TResponse>> ExecuteAsync<TResponse>(RestRequest request) where TResponse : new();
-        IRestResponse<TResponse> Execute<TResponse>(RestRequest request) where TResponse : new();
+        Task<IRestResponse> ExecuteAsync(IRestRequest request);
+        Task<IRestResponse<TResponse>> ExecuteAsync<TResponse>(IRestRequest request) where TResponse : new();
+        IRestResponse<TResponse> Execute<TResponse>(IRestRequest request) where TResponse : new();
 
-        RestRequest AddAuthorizationToRequest(EasyPostRequest request);
+        IRestRequest AddAuthorizationToRequest(EasyPostRequest request);
     }
 }

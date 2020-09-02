@@ -158,7 +158,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="request">EasyPost request to be executed</param>
         /// <returns>RestSharp request to execute</returns>
-        internal RestRequest PrepareRequest(
+        internal IRestRequest PrepareRequest(
             EasyPostRequest request)
         {
             var restRequest = RestClient.AddAuthorizationToRequest(request);

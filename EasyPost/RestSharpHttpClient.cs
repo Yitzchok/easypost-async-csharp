@@ -38,16 +38,16 @@ namespace EasyPost
 
         public Uri BaseUrl => restClient.BaseUrl;
 
-        public Task<IRestResponse> ExecuteAsync(RestRequest request) =>
+        public Task<IRestResponse> ExecuteAsync(IRestRequest request) =>
             restClient.ExecuteAsync(request);
 
-        public Task<IRestResponse<TResponse>> ExecuteAsync<TResponse>(RestRequest request) where TResponse : new() =>
+        public Task<IRestResponse<TResponse>> ExecuteAsync<TResponse>(IRestRequest request) where TResponse : new() =>
             restClient.ExecuteAsync<TResponse>(request);
 
-        public IRestResponse<TResponse> Execute<TResponse>(RestRequest request) where TResponse : new() =>
+        public IRestResponse<TResponse> Execute<TResponse>(IRestRequest request) where TResponse : new() =>
             restClient.Execute<TResponse>(request);
 
-        public RestRequest AddAuthorizationToRequest(EasyPostRequest request)
+        public IRestRequest AddAuthorizationToRequest(EasyPostRequest request)
         {
             var restRequest = request.RestRequest;
 
