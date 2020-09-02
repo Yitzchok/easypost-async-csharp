@@ -12,9 +12,7 @@ namespace EasyPost
         public RestSharpHttpClient(ClientConfiguration clientConfiguration)
         {
             if (clientConfiguration == null)
-            {
                 throw new ArgumentNullException(nameof(clientConfiguration));
-            }
 
             Configuration = clientConfiguration;
             restClient = new RestClient(clientConfiguration.ApiBase);
