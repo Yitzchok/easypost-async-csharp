@@ -60,7 +60,8 @@ namespace EasyPostTest
                     EelPfc = "NOEEI 30.37(a)",
                     CustomsItems = new List<CustomsItem> {
                         new CustomsItem {
-                            Description = "description"
+                            Description = "description",
+                            Quantity = 1
                         }
                     }
                 },
