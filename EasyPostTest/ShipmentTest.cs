@@ -117,9 +117,10 @@ namespace EasyPostTest
             }).ConfigureAwait(false);
 
             Assert.IsNotNull(shipment.Id);
-            Assert.AreEqual(shipment.Messages[0].Carrier, "UPS");
-            Assert.AreEqual(shipment.Messages[0].Type, "rate_error");
-            Assert.AreEqual(shipment.Messages[0].Message, "Unable to retrieve UPS rates for another carrier's predefined_package parcel type.");
+            Assert.AreEqual("UPS", shipment.Messages[0].Carrier);
+            Assert.AreEqual("rate_error", shipment.Messages[0].Type);
+            Assert.AreEqual("Unable to retrieve UPS rates for another carrier's predefined_package parcel type.",
+                shipment.Messages[0].Message);
         }
 
         [TestMethod]
