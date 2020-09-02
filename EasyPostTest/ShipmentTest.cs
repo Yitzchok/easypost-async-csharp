@@ -92,14 +92,13 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestOptions()
         {
-            var tomorrow = DateTime.Now.AddDays(1);
+            var tomorrow = DateTime.UtcNow.AddDays(1);
             _testShipment.Options = new Options
             {
                 LabelDate = tomorrow
             };
             var shipment = await _client.CreateShipment(_testShipment);
 
-            shipment.Options.LabelDate = shipment.Options.LabelDate.Value.ToLocalTime();
             Assert.AreEqual(shipment.Options.LabelDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
 
