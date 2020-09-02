@@ -22,7 +22,7 @@ namespace EasyPostTest
         private Shipment _shipment;
 
         [TestInitialize]
-        public void Initialize()
+        public async Task Initialize()
         {
             _client = new EasyPostClient("WzJHJ6SoPnBVYu0ae4aIHA");
             _address = new Address
@@ -56,7 +56,8 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94102",
             };
-            _shipment = _client.CreateShipment(new Shipment
+   
+            _shipment = await _client.CreateShipment(new Shipment
             {
                 Parcel = new Parcel
                 {
@@ -68,8 +69,10 @@ namespace EasyPostTest
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
                 Reference = "ShipmentRef",
-            }).Result;
-            _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id).Wait();
+            });
+
+            await _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id);
+         
             _testPickup = new Pickup
             {
                 IsAccountAddress = false,
