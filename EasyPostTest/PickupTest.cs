@@ -7,6 +7,7 @@
  */
 
 using System;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EasyPost;
 
@@ -21,10 +22,11 @@ namespace EasyPostTest
         private Shipment _shipment;
 
         [TestInitialize]
-        public void Initialize()
+        public async Task Initialize()
         {
             _client = new EasyPostClient("WzJHJ6SoPnBVYu0ae4aIHA");
-            _address = new Address {
+            _address = new Address
+            {
                 Company = "Simpler Postage Inc",
                 Street1 = "164 Townsend Street",
                 Street2 = "Unit 1",
@@ -34,7 +36,8 @@ namespace EasyPostTest
                 Zip = "94107",
                 Phone = "1234567890"
             };
-            _toAddress = new Address {
+            _toAddress = new Address
+            {
                 Company = "Simpler Postage Inc",
                 Street1 = "164 Townsend Street",
                 Street2 = "Unit 1",
@@ -43,7 +46,8 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94107",
             };
-            _fromAddress = new Address {
+            _fromAddress = new Address
+            {
                 Name = "Andrew Tribone",
                 Street1 = "480 Fell St",
                 Street2 = "#3",
@@ -52,8 +56,11 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94102",
             };
-            _shipment = _client.CreateShipment(new Shipment {
-                Parcel = new Parcel {
+   
+            _shipment = await _client.CreateShipment(new Shipment
+            {
+                Parcel = new Parcel
+                {
                     Length = 8,
                     Width = 6,
                     Height = 5,
@@ -62,9 +69,12 @@ namespace EasyPostTest
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
                 Reference = "ShipmentRef",
-            }).Result;
-            _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id).Wait();
-            _testPickup = new Pickup {
+            });
+
+            await _client.BuyShipment(_shipment.Id, _shipment.LowestRate().Id);
+         
+            _testPickup = new Pickup
+            {
                 IsAccountAddress = false,
                 Address = _address,
                 Shipment = _shipment,
@@ -74,26 +84,26 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public void TestCreateAndRetrieve()
+        public async Task TestCreateAndRetrieve()
         {
-            var pickup = _client.CreatePickup(_testPickup).Result;
+            var pickup = await _client.CreatePickup(_testPickup);
 
             Assert.IsNotNull(pickup.Id);
             Assert.AreEqual(pickup.Address.Street1, "164 Townsend Street");
 
-            var retrieved = _client.GetPickup(pickup.Id).Result;
+            var retrieved = await _client.GetPickup(pickup.Id);
             Assert.AreEqual(pickup.Id, retrieved.Id);
         }
 
         [TestMethod]
-        public void TestBuyAndCancel()
+        public async Task TestBuyAndCancel()
         {
-            var pickup = _client.CreatePickup(_testPickup).Result;
+            var pickup = await _client.CreatePickup(_testPickup);
 
-            pickup = _client.BuyPickup(pickup.Id, "UPS", pickup.PickupRates[0].Service).Result;
+            pickup = await _client.BuyPickup(pickup.Id, "UPS", pickup.PickupRates[0].Service);
             Assert.IsNotNull(pickup.Confirmation);
 
-            pickup = _client.CancelPickp(pickup.Id).Result;
+            pickup = await _client.CancelPickp(pickup.Id);
             Assert.AreEqual(pickup.Status, "canceled");
         }
     }

@@ -27,7 +27,8 @@ namespace EasyPostTest
         {
             _client = new EasyPostClient("cueqNZUb3ldeWTNX7MU3Mel8UXtaAMUi");
 
-            _toAddress = new Address {
+            _toAddress = new Address
+            {
                 Company = "Simpler Postage Inc",
                 Street1 = "164 Townsend Street",
                 Street2 = "Unit 1",
@@ -36,7 +37,8 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94107",
             };
-            _fromAddress = new Address {
+            _fromAddress = new Address
+            {
                 Name = "Andrew Tribone",
                 Street1 = "480 Fell St",
                 Street2 = "#3",
@@ -45,22 +47,26 @@ namespace EasyPostTest
                 Country = "US",
                 Zip = "94102",
             };
-            _testShipment = new Shipment {
+            _testShipment = new Shipment
+            {
                 ToAddress = _toAddress,
                 FromAddress = _fromAddress,
-                Parcel = new Parcel {
+                Parcel = new Parcel
+                {
                     Length = 8,
                     Width = 6,
                     Height = 5,
                     Weight = 10,
                 },
                 Reference = "ShipmentRef",
-                CustomsInfo = new CustomsInfo {
+                CustomsInfo = new CustomsInfo
+                {
                     CustomsCertify = true,
                     EelPfc = "NOEEI 30.37(a)",
                     CustomsItems = new List<CustomsItem> {
                         new CustomsItem {
-                            Description = "description"
+                            Description = "description",
+                            Quantity = 1
                         }
                     }
                 },
@@ -91,14 +97,13 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestOptions()
         {
-            var tomorrow = DateTime.Now.AddDays(1);
+            var tomorrow = DateTime.UtcNow.AddDays(1);
             _testShipment.Options = new Options
             {
                 LabelDate = tomorrow
             };
             var shipment = await _client.CreateShipment(_testShipment);
 
-            shipment.Options.LabelDate = shipment.Options.LabelDate.Value.ToLocalTime();
             Assert.AreEqual(shipment.Options.LabelDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
         }
 
@@ -117,9 +122,11 @@ namespace EasyPostTest
             }).ConfigureAwait(false);
 
             Assert.IsNotNull(shipment.Id);
-            Assert.AreEqual(shipment.Messages[0].Carrier, "UPS");
-            Assert.AreEqual(shipment.Messages[0].Type, "rate_error");
-            Assert.AreEqual(shipment.Messages[0].Message, "Unable to retrieve UPS rates for another carrier's predefined_package parcel type.");
+            var easyPostMessage = shipment.Messages[0];
+
+            Assert.IsNotNull(easyPostMessage.Carrier);
+            Assert.AreEqual("rate_error", easyPostMessage.Type);
+            Assert.IsNotNull(easyPostMessage.Message);
         }
 
         [TestMethod]
@@ -156,7 +163,7 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestGenerateLabelStampBarcode()
         {
-            var shipment =await BuyShipment();
+            var shipment = await BuyShipment();
 
             shipment = await _client.GenerateLabel(shipment.Id, "pdf");
             Assert.IsNotNull(shipment.PostageLabel);
@@ -223,7 +230,8 @@ namespace EasyPostTest
         [TestMethod]
         public async Task TestListWithOptions()
         {
-            var shipmentList = await _client.ListShipments(new ShipmentListOptions {
+            var shipmentList = await _client.ListShipments(new ShipmentListOptions
+            {
                 EndDatetime = DateTime.UtcNow,
                 PageSize = 1
             });

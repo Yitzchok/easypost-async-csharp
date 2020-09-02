@@ -105,7 +105,7 @@ namespace EasyPostTest
             Assert.AreEqual(address.Company, "SIMPLER POSTAGE INC");
             Assert.AreEqual(address.Street1, "164 TOWNSEND ST UNIT 1");
             Assert.IsNull(address.Name);
-            Assert.IsTrue((bool)address.Residential);
+            Assert.IsFalse((bool)address.Residential);
         }
 
         [TestMethod]

@@ -6,7 +6,6 @@
  * All Rights Reserved
  */
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
@@ -90,7 +89,7 @@ namespace EasyPost
         private Task<IRestResponse> Execute(
             EasyPostRequest request)
         {
-            return RestClient.ExecuteTaskAsync(PrepareRequest(request));
+            return RestClient.ExecuteAsync(PrepareRequest(request));
         }
 
         /// <summary>
@@ -103,11 +102,15 @@ namespace EasyPost
             EasyPostRequest request) where TResponse : new()
         {
             IRestResponse<TResponse> response;
+            
+            var preparedRequest = PrepareRequest(request);
+            
             if (ExecuteNonAsync) {
-                response = RestClient.Execute<TResponse>(PrepareRequest(request));
+                response = RestClient.Execute<TResponse>(preparedRequest);
             } else {
-                response = await RestClient.ExecuteTaskAsync<TResponse>(PrepareRequest(request));
+                response = await RestClient.ExecuteAsync<TResponse>(preparedRequest).ConfigureAwait(false);
             }
+
             var statusCode = response.StatusCode;
             var data = response.Data;
 
@@ -155,7 +158,7 @@ namespace EasyPost
         /// </summary>
         /// <param name="request">EasyPost request to be executed</param>
         /// <returns>RestSharp request to execute</returns>
-        internal RestRequest PrepareRequest(
+        internal IRestRequest PrepareRequest(
             EasyPostRequest request)
         {
             var restRequest = RestClient.AddAuthorizationToRequest(request);

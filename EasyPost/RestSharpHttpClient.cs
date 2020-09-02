@@ -12,9 +12,7 @@ namespace EasyPost
         public RestSharpHttpClient(ClientConfiguration clientConfiguration)
         {
             if (clientConfiguration == null)
-            {
                 throw new ArgumentNullException(nameof(clientConfiguration));
-            }
 
             Configuration = clientConfiguration;
             restClient = new RestClient(clientConfiguration.ApiBase);
@@ -38,16 +36,16 @@ namespace EasyPost
 
         public Uri BaseUrl => restClient.BaseUrl;
 
-        public Task<IRestResponse> ExecuteTaskAsync(RestRequest request) =>
-            restClient.ExecuteTaskAsync(request);
+        public Task<IRestResponse> ExecuteAsync(IRestRequest request) =>
+            restClient.ExecuteAsync(request);
 
-        public Task<IRestResponse<TResponse>> ExecuteTaskAsync<TResponse>(RestRequest request) where TResponse : new() =>
-            restClient.ExecuteTaskAsync<TResponse>(request);
+        public Task<IRestResponse<TResponse>> ExecuteAsync<TResponse>(IRestRequest request) where TResponse : new() =>
+            restClient.ExecuteAsync<TResponse>(request);
 
-        public IRestResponse<TResponse> Execute<TResponse>(RestRequest request) where TResponse : new() =>
+        public IRestResponse<TResponse> Execute<TResponse>(IRestRequest request) where TResponse : new() =>
             restClient.Execute<TResponse>(request);
 
-        public RestRequest AddAuthorizationToRequest(EasyPostRequest request)
+        public IRestRequest AddAuthorizationToRequest(EasyPostRequest request)
         {
             var restRequest = request.RestRequest;
 
