@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using RestSharp;
+using RestSharp.Serializers.NewtonsoftJson;
 
 namespace EasyPost
 {
@@ -16,6 +17,7 @@ namespace EasyPost
 
             Configuration = clientConfiguration;
             restClient = new RestClient(clientConfiguration.ApiBase);
+            restClient.UseNewtonsoftJson();
 
             if (clientConfiguration.Timeout > 0)
             {
