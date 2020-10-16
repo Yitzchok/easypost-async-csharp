@@ -102,13 +102,13 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">String representing an Address. Starts with "adr_".</param>
         /// <returns>EasyPost.Address instance.</returns>
-        public async Task<Address> GetAddress(
+        public Task<Address> GetAddress(
             string id)
         {
             var request = new EasyPostRequest("addresses/{id}");
             request.AddUrlSegment("id", id);
 
-            return await Execute<Address>(request);
+            return Execute<Address>(request);
         }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace EasyPost
         /// extended zip4 value. If you use the strict versions an HttpException to be raised if unsucessful. 
         /// </param>
         /// <returns>Address instance.</returns>
-        public async Task<Address> CreateAddress(
+        public Task<Address> CreateAddress(
             Address address,
             VerificationFlags verify = VerificationFlags.None)
         {
@@ -139,7 +139,7 @@ namespace EasyPost
                 request.AddParameter("verify_strict[]", "zip4", ParameterType.QueryString);
             }
 
-            return await Execute<Address>(request);
+            return Execute<Address>(request);
         }
 
         /// <summary>
