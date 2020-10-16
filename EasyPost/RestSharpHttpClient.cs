@@ -1,12 +1,27 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RestSharp;
-using RestSharp.Serializers.NewtonsoftJson;
 
 namespace EasyPost
 {
     public class RestSharpHttpClient : IHttpClient
     {
+        readonly JsonSerializerSettings EasyPostSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new DefaultContractResolver
+            {
+                NamingStrategy = new SnakeCaseNamingStrategy()
+            },
+            DefaultValueHandling = DefaultValueHandling.Include,
+            TypeNameHandling = TypeNameHandling.None,
+            NullValueHandling = NullValueHandling.Ignore,
+            Formatting = Formatting.None,
+            DateFormatString = "yyyy-MM-ddTHH:mm:sszzz",
+            DateTimeZoneHandling = DateTimeZoneHandling.Utc
+        };
+
         internal readonly IRestClient restClient;
         internal readonly ClientConfiguration Configuration;
 
@@ -17,7 +32,8 @@ namespace EasyPost
 
             Configuration = clientConfiguration;
             restClient = new RestClient(clientConfiguration.ApiBase);
-            restClient.UseNewtonsoftJson();
+
+            restClient.UseSerializer(() => new JsonNetWithRootElementSerializer(EasyPostSettings));
 
             if (clientConfiguration.Timeout > 0)
             {
