@@ -51,7 +51,7 @@ namespace EasyPost
         }
 
         /// <summary>
-        /// Gets the value for the property. If the propery is a reference to another resources we 
+        /// Gets the value for the property. If the property is a reference to another resources we 
         /// recurse into that resource and dump it as well as a dictionary.
         /// </summary>
         /// <param name="info">Property info for the property</param>
