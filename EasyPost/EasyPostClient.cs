@@ -162,7 +162,7 @@ namespace EasyPost
             EasyPostRequest request)
         {
             var restRequest = RestClient.AddAuthorizationToRequest(request);
-            restRequest.AddHeader("user_agent", string.Concat("EasyPost/CSharpASync/", Version));
+            restRequest.AddHeader("user_agent", string.Concat("EasyPost/CSharpAsync/", Version));
             restRequest.AddHeader("content_type", "application/x-www-form-urlencoded");
             return restRequest;
         }

@@ -44,7 +44,7 @@ namespace EasyPostTest
             var request = new EasyPostRequest("resource");
 
             var parameters = client.PrepareRequest(request).Parameters.Select(parameter => parameter.ToString()).ToList();
-            CollectionAssert.Contains(parameters, "user_agent=EasyPost/CSharpASync/" + client.Version);
+            CollectionAssert.Contains(parameters, "user_agent=EasyPost/CSharpAsync/" + client.Version);
             CollectionAssert.Contains(parameters, "authorization=Bearer apiKey");
             CollectionAssert.Contains(parameters, "content_type=application/x-www-form-urlencoded");
         }
@@ -56,7 +56,7 @@ namespace EasyPostTest
             var request = new EasyPostRequest("resource");
 
             var parameters = client.PrepareRequest(request).Parameters.Select(parameter => parameter.ToString()).ToList();
-            CollectionAssert.Contains(parameters, "user_agent=EasyPost/CSharpASync/" + client.Version);
+            CollectionAssert.Contains(parameters, "user_agent=EasyPost/CSharpAsync/" + client.Version);
             CollectionAssert.Contains(parameters, "authorization=Bearer someapikey");
             CollectionAssert.Contains(parameters, "content_type=application/x-www-form-urlencoded");
         }
