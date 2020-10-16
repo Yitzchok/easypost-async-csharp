@@ -102,9 +102,11 @@ namespace EasyPostTest
             {
                 LabelDate = tomorrow
             };
+
             var shipment = await _client.CreateShipment(_testShipment);
 
-            Assert.AreEqual(shipment.Options.LabelDate.Value.ToString("yyyy-MM-ddTHH:mm:sszzz"), tomorrow.ToString("yyyy-MM-ddTHH:mm:sszzz"));
+            var format = "yyyy-MM-ddTHH:mm:sszzz";
+            Assert.AreEqual(tomorrow.ToString(format), shipment.Options.LabelDate.Value.ToString(format));
         }
 
         [TestMethod]
