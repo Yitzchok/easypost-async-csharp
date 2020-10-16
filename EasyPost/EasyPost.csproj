@@ -7,7 +7,7 @@
     <AssemblyName>EasyPostAsync</AssemblyName>
     <Title>EasyPost Async</Title>
     <Description>EasyPost Async Shipping API Client Library for .NET https://easypost.com/docs</Description>
-    <Version>3.0.1</Version>
+    <Version>3.0.2</Version>
     <PackageProjectUrl>https://github.com/Yitzchok/easypost-async-csharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yitzchok/easypost-async-csharp</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -27,7 +27,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="RestSharp" Version="106.11.4" />
+    <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />
   </ItemGroup>
 </Project>

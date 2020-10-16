@@ -43,10 +43,10 @@ namespace EasyPost
         /// Get a list of all carrier types
         /// </summary>
         /// <returns>List of carrier types</returns>
-        public async Task<List<CarrierType>> ListCarrierTypes()
+        public Task<List<CarrierType>> ListCarrierTypes()
         {
             var request = new EasyPostRequest("carrier_types");
-            return await Execute<List<CarrierType>>(request);
+            return Execute<List<CarrierType>>(request);
         }
     }
 }
