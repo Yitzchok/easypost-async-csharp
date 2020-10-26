@@ -314,37 +314,7 @@ namespace EasyPost
 
             return Execute<Shipment>(request);
         }
-
-        /// <summary>
-        /// Generate a stamp for this shipment.
-        /// </summary>
-        /// <param name="id">The id of the shipment to generate the stamp for</param>
-        /// <returns>URL for the stamp</returns>
-        public async Task<string> GenerateStamp(
-            string id)
-        {
-            var request = new EasyPostRequest("shipments/{id}/stamp");
-            request.AddUrlSegment("id", id);
-
-            var response = await Execute<Shipment>(request);
-            return response.StampUrl;
-        }
-
-        /// <summary>
-        /// Generate a barcode for this shipment.
-        /// </summary>
-        /// <param name="id">The id of the shipment to generate the stamp for</param>
-        /// <returns>URL for the barcode</returns>
-        public async Task<string> GenerateBarcode(
-            string id)
-        {
-            var request = new EasyPostRequest("shipments/{id}/barcode");
-            request.AddUrlSegment("id", id);
-
-            var response = await Execute<Shipment>(request);
-            return response.BarcodeUrl;
-        }
-
+        
         /// <summary>
         /// Send a refund request to the carrier the shipment was purchased from.
         /// </summary>

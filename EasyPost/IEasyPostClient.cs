@@ -507,23 +507,7 @@ namespace EasyPost
         Task<Shipment> GenerateLabel(
             string id,
             string fileFormat);
-
-        /// <summary>
-        /// Generate a stamp for this shipment.
-        /// </summary>
-        /// <param name="id">The id of the shipment to generate the stamp for</param>
-        /// <returns>URL for the stamp</returns>
-        Task<string> GenerateStamp(
-            string id);
-
-        /// <summary>
-        /// Generate a barcode for this shipment.
-        /// </summary>
-        /// <param name="id">The id of the shipment to generate the stamp for</param>
-        /// <returns>URL for the barcode</returns>
-        Task<string> GenerateBarcode(
-            string id);
-
+        
         /// <summary>
         /// Send a refund request to the carrier the shipment was purchased from.
         /// </summary>
