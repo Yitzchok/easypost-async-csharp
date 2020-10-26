@@ -70,6 +70,7 @@ namespace EasyPostTest
                         }
                     }
                 },
+                Options = new Options()
             };
         }
 
@@ -107,6 +108,14 @@ namespace EasyPostTest
 
             var format = "yyyy-MM-ddTHH:mm:sszzz";
             Assert.AreEqual(tomorrow.ToString(format), shipment.Options.LabelDate.Value.ToString(format));
+        }
+
+        [TestMethod]
+        public async Task TestPostageInline()
+        {
+            _testShipment.Options.PostageLabelInline = true;
+            Shipment shipment = await BuyShipment();
+            Assert.IsNotNull(shipment.PostageLabel.LabelFile);
         }
 
         [TestMethod]

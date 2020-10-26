@@ -23,5 +23,6 @@ namespace EasyPost
         public string LabelPdfUrl { get; set; }
         public string LabelEpl2Url { get; set; }
         public string LabelZplUrl { get; set; }
+        public string LabelFile { get; set; }
     }
 }

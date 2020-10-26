@@ -172,6 +172,11 @@ namespace EasyPost
         public string LabelFormat { get; set; }
 
         /// <summary>
+        /// Return the postage label inline
+        /// </summary>
+        public bool? PostageLabelInline { get; set; }
+
+        /// <summary>
         /// Whether or not the parcel can be processed by the carriers equipment.
         /// </summary>
         public bool? Machinable { get; set; }
@@ -311,7 +316,7 @@ namespace EasyPost
         public string CostCenter { get; set; }
 
         /// <summary>
-        /// Customs brokeder address ID
+        /// Customs broker address ID
         /// </summary>
         public string CustomsBrokerAddressId { get; set; }
 
@@ -326,7 +331,7 @@ namespace EasyPost
         public bool? DeliveredDutyPaid { get; set; }
 
         /// <summary>
-        /// Delivert time preference
+        /// Delivery time preference
         /// </summary>
         public string DeliveryTimePreference { get; set; }
 
