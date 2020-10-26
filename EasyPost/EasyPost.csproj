@@ -7,7 +7,7 @@
     <AssemblyName>EasyPostAsync</AssemblyName>
     <Title>EasyPost Async</Title>
     <Description>EasyPost Async Shipping API Client Library for .NET https://easypost.com/docs</Description>
-    <Version>3.0.2</Version>
+    <Version>3.1.0</Version>
     <PackageProjectUrl>https://github.com/Yitzchok/easypost-async-csharp</PackageProjectUrl>
     <RepositoryUrl>https://github.com/Yitzchok/easypost-async-csharp</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
