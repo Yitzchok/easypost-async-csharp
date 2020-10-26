@@ -174,7 +174,7 @@ namespace EasyPost
         /// <summary>
         /// Return the postage label inline
         /// </summary>
-        public bool PostageLabelInline { get; set; }
+        public bool? PostageLabelInline { get; set; }
 
         /// <summary>
         /// Whether or not the parcel can be processed by the carriers equipment.
