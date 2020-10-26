@@ -172,18 +172,12 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public async Task TestGenerateLabelStampBarcode()
+        public async Task TestGenerateLabel()
         {
             var shipment = await BuyShipment();
 
             shipment = await _client.GenerateLabel(shipment.Id, "pdf");
             Assert.IsNotNull(shipment.PostageLabel);
-
-            var url = _client.GenerateStamp(shipment.Id);
-            Assert.IsNotNull(url);
-
-            url = _client.GenerateBarcode(shipment.Id);
-            Assert.IsNotNull(url);
         }
 
         [TestMethod]
