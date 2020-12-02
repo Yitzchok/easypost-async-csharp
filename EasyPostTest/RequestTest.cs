@@ -81,6 +81,22 @@ namespace EasyPostTest
         }
 
         [TestMethod]
+        public void TestFlattenParametersWithoutBaseParent()
+        {
+            var request = new EasyPostRequest("resource");
+            var parameters = new Dictionary<string, object> {
+                { "foo", "bar" },
+                { "baz", "qux" },
+                { "fazz", new Dictionary<string, object> { { "bar", "baz" } } }
+            };
+
+            var result = request.FlattenParameters(parameters, "");
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("foo", "bar"));
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("baz", "qux"));
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("fazz[bar]", "baz"));
+        }
+
+        [TestMethod]
         public void TestFlattenParameters()
         {
             var request = new EasyPostRequest("resource");

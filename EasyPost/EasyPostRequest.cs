@@ -162,11 +162,13 @@ namespace EasyPost
         {
             var result = new List<KeyValuePair<string, string>>();
             foreach (var pair in parameters) {
+                var key = GetKeyWitParent(parent, pair);
+
                 if (pair.Value is Dictionary<string, object>) {
-                    result.AddRange(FlattenParameters((Dictionary<string, object>)pair.Value, string.Concat(parent, "[", pair.Key, "]")));
+                    result.AddRange(FlattenParameters((Dictionary<string, object>)pair.Value, key));
                 } else if (pair.Value is IResource) {
                     var value = (IResource)pair.Value;
-                    result.AddRange(FlattenParameters(value.AsDictionary(), string.Concat(parent, "[", pair.Key, "]")));
+                    result.AddRange(FlattenParameters(value.AsDictionary(), key));
                 } else if (pair.Value is List<IResource>) {
                     FlattenList(parent, result, pair);
                 } else if (pair.Value is IList && pair.Value.GetType().GetGenericArguments().Single().GetInterfaces().Contains(typeof(IResource))) {
@@ -174,24 +176,33 @@ namespace EasyPost
                 } else if (pair.Value is List<string>) {
                     var list = (List<string>)pair.Value;
                     for (var i = 0; i < list.Count; i++) {
-                        result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "][", i, "]"), list[i]));
+                        result.Add(new KeyValuePair<string, string>(string.Concat(key, "[", i, "]"), list[i]));
                     }
                 } else if (pair.Value is List<Dictionary<string, object>>) {
                     var list = (List<Dictionary<string, object>>)pair.Value;
                     for (var i = 0; i < list.Count; i++) {
-                        result.AddRange(FlattenParameters(list[i], string.Concat(parent, "[", pair.Key, "][", i, "]")));
+                        result.AddRange(FlattenParameters(list[i], string.Concat(key, "[", i, "]")));
                     }
                 } else if (pair.Value is DateTime time) {
                     // Force the date time to be UTC over the wire. Even though the docs say it should handle time 
                     // zone offsets, it does not appear to do that.
                     var dateTime = time.ToUniversalTime();
-                    result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "]"),
-                        Convert.ToString(dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"))));
+                    result.Add(new KeyValuePair<string, string>(key, Convert.ToString(dateTime.ToString("yyyy-MM-ddTHH:mm:ssZ"))));
                 } else if (pair.Value != null) {
-                    result.Add(new KeyValuePair<string, string>(string.Concat(parent, "[", pair.Key, "]"), pair.Value.ToString()));
+                    result.Add(new KeyValuePair<string, string>(key, pair.Value.ToString()));
                 }
             }
             return result;
+        }
+
+        private string GetKeyWitParent(
+            string parent,
+            KeyValuePair<string, object> pair)
+        {
+            if(string.IsNullOrEmpty(parent))
+                return pair.Key;
+
+            return $"{parent}[{pair.Key}]";
         }
 
         /// <summary>
