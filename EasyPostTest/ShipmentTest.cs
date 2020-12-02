@@ -160,7 +160,7 @@ namespace EasyPostTest
             Assert.IsNotNull(shipment.PostageLabel);
 
             shipment = await _client.BuyInsuranceForShipment(shipment.Id, 100.1);
-            Assert.AreNotEqual(shipment.Insurance, 100.1);
+            Assert.AreEqual(shipment.Insurance, "100.10");
         }
 
         [TestMethod]
