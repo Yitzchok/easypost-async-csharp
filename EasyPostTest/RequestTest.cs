@@ -9,6 +9,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using EasyPost;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RestSharp;
@@ -53,15 +54,19 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public void TestAddBodyWithListOfIResource()
+        public async Task TestAddBodyWithListOfIResource()
         {
             var request = new EasyPostRequest("resource");
-            var address = _client.GetAddress("adr_f1369ed31d114c308f627d8879655bd5").Result;
+            var address = await _client.GetAddress("adr_f1369ed31d114c308f627d8879655bd5");
             request.AddBody(new Dictionary<string, object> { { "foo", new List<Address> { address } } }, "parent");
 
             var restRequest = request.RestRequest;
-            CollectionAssert.Contains(restRequest.Parameters.Select(parameter => parameter.ToString()).ToList(),
-                "application/x-www-form-urlencoded=parent%5Bfoo%5D%5B0%5D%5Bstreet1%5D=164%20Townsend%20St&parent%5Bfoo%5D%5B0%5D%5Bstreet2%5D=Unit%201&parent%5Bfoo%5D%5B0%5D%5Bcity%5D=San%20Francisco&parent%5Bfoo%5D%5B0%5D%5Bstate%5D=CA&parent%5Bfoo%5D%5B0%5D%5Bzip%5D=94107&parent%5Bfoo%5D%5B0%5D%5Bcountry%5D=US&parent%5Bfoo%5D%5B0%5D%5Bresidential%5D=False&parent%5Bfoo%5D%5B0%5D%5Bname%5D=EasyPost&parent%5Bfoo%5D%5B0%5D%5Bphone%5D=4154567890&parent%5Bfoo%5D%5B0%5D%5Bid%5D=adr_f1369ed31d114c308f627d8879655bd5&parent%5Bfoo%5D%5B0%5D%5Bobject%5D=Address&parent%5Bfoo%5D%5B0%5D%5Bcreated_at%5D=2015-09-15T16%3A03%3A23-07%3A00&parent%5Bfoo%5D%5B0%5D%5Bupdated_at%5D=2015-09-15T16%3A03%3A23-07%3A00&parent%5Bfoo%5D%5B0%5D%5Bmode%5D=test");
+            var body = restRequest.Parameters.Single(x => x.Type == ParameterType.RequestBody);
+
+            var expectedBody = "parent%5Bfoo%5D%5B0%5D%5Bstreet1%5D=164%20Townsend%20St&parent%5Bfoo%5D%5B0%5D%5Bstreet2%5D=Unit%201&parent%5Bfoo%5D%5B0%5D%5Bcity%5D=San%20Francisco&parent%5Bfoo%5D%5B0%5D%5Bstate%5D=CA&parent%5Bfoo%5D%5B0%5D%5Bzip%5D=94107&parent%5Bfoo%5D%5B0%5D%5Bcountry%5D=US&parent%5Bfoo%5D%5B0%5D%5Bresidential%5D=False&parent%5Bfoo%5D%5B0%5D%5Bname%5D=EasyPost&parent%5Bfoo%5D%5B0%5D%5Bphone%5D=4154567890&parent%5Bfoo%5D%5B0%5D%5Bid%5D=adr_f1369ed31d114c308f627d8879655bd5&parent%5Bfoo%5D%5B0%5D%5Bobject%5D=Address&parent%5Bfoo%5D%5B0%5D%5Bcreated_at%5D=2015-09-15T16%3A03%3A23Z&parent%5Bfoo%5D%5B0%5D%5Bupdated_at%5D=2015-09-15T16%3A03%3A23Z&parent%5Bfoo%5D%5B0%5D%5Bmode%5D=test";
+
+            Assert.AreEqual("application/x-www-form-urlencoded", body.Name);
+            Assert.AreEqual(expectedBody, body.Value);
         }
 
         [TestMethod]
@@ -73,6 +78,22 @@ namespace EasyPostTest
                 new KeyValuePair<string, string>("parent[baz]", "qux")
             });
             Assert.AreEqual(result, "parent%5Bfoo%5D=bar&parent%5Bbaz%5D=qux");
+        }
+
+        [TestMethod]
+        public void TestFlattenParametersWithoutBaseParent()
+        {
+            var request = new EasyPostRequest("resource");
+            var parameters = new Dictionary<string, object> {
+                { "foo", "bar" },
+                { "baz", "qux" },
+                { "fazz", new Dictionary<string, object> { { "bar", "baz" } } }
+            };
+
+            var result = request.FlattenParameters(parameters, "");
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("foo", "bar"));
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("baz", "qux"));
+            CollectionAssert.Contains(result, new KeyValuePair<string, string>("fazz[bar]", "baz"));
         }
 
         [TestMethod]
