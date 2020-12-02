@@ -161,7 +161,7 @@ namespace EasyPostTest
             Assert.IsNotNull(shipment.PostageLabel);
 
             shipment = await _client.BuyInsuranceForShipment(shipment.Id, 100.1);
-            Assert.AreEqual(shipment.Insurance, "100.10");
+            Assert.AreEqual("100.10", shipment.Insurance);
         }
 
         [TestMethod]
@@ -175,8 +175,9 @@ namespace EasyPostTest
 
             Assert.IsNotNull(shipment.PostageLabel);
 
-            Assert.AreEqual(shipment.Insurance, "200.00");
-            Assert.IsTrue(shipment.Fees.Single(x => x.Type == "InsuranceFee").Amount > 0);
+            Assert.AreEqual("200.00", shipment.Insurance);
+            Assert.IsTrue(shipment.Fees.Any(x => x.Type == "InsuranceFee"));
+            Assert.IsTrue(shipment.Fees.SingleOrDefault(x => x.Type == "InsuranceFee")?.Amount > 0);
         }
 
         [TestMethod]
