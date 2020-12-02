@@ -155,7 +155,7 @@ namespace EasyPostTest
         {
             var shipment = await _client.CreateShipment(_testShipment);
             Assert.IsNotNull(shipment.Rates);
-            Assert.AreNotEqual(shipment.Rates.Count, 0);
+            Assert.AreNotEqual(0, shipment.Rates.Count);
 
             shipment = await _client.BuyShipment(shipment.Id, shipment.Rates[0].Id);
             Assert.IsNotNull(shipment.PostageLabel);
@@ -169,7 +169,7 @@ namespace EasyPostTest
         {
             var shipment = await _client.CreateShipment(_testShipment);
             Assert.IsNotNull(shipment.Rates);
-            Assert.AreNotEqual(shipment.Rates.Count, 0);
+            Assert.AreNotEqual(0, shipment.Rates.Count);
 
             shipment = await _client.BuyShipment(shipment.Id, shipment.Rates[0].Id, 200);
 

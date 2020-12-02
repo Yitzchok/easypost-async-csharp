@@ -275,7 +275,13 @@ namespace EasyPost
         {
             var request = new EasyPostRequest("shipments/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);
-            request.AddBody(new Dictionary<string, object> { { "id", rateId } }, "rate");
+
+            var parameters = new Dictionary<string, object> { { "rate", new Dictionary<string, object> { { "id", rateId } } } };
+
+            if (insuranceValue > 0)
+                parameters["insurance"] = insuranceValue.Value;
+
+            request.AddBody(parameters, "");
 
             return Execute<Shipment>(request);
         }
