@@ -262,13 +262,16 @@ namespace EasyPost
 
         /// <summary>
         /// Buy a label for this shipment with the given rate.
+        /// Optionally include insurance
         /// </summary>
         /// <param name="id">The id of the shipment to buy the label for</param>
         /// <param name="rateId">The id of the rate to purchase the shipment with.</param>
+        /// <param name="insuranceValue">The value to insure the shipment for.</param>
         /// <returns>Shipment instance.</returns>
         public Task<Shipment> BuyShipment(
             string id,
-            string rateId)
+            string rateId,
+            double? insuranceValue = null)
         {
             var request = new EasyPostRequest("shipments/{id}/buy", Method.POST);
             request.AddUrlSegment("id", id);

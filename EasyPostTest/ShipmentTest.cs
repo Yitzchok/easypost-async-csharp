@@ -8,6 +8,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using EasyPost;
@@ -161,6 +162,21 @@ namespace EasyPostTest
 
             shipment = await _client.BuyInsuranceForShipment(shipment.Id, 100.1);
             Assert.AreEqual(shipment.Insurance, "100.10");
+        }
+
+        [TestMethod]
+        public async Task TestBuyTogetherWithInsurance()
+        {
+            var shipment = await _client.CreateShipment(_testShipment);
+            Assert.IsNotNull(shipment.Rates);
+            Assert.AreNotEqual(shipment.Rates.Count, 0);
+
+            shipment = await _client.BuyShipment(shipment.Id, shipment.Rates[0].Id, 200);
+
+            Assert.IsNotNull(shipment.PostageLabel);
+
+            Assert.AreEqual(shipment.Insurance, "200.00");
+            Assert.IsTrue(shipment.Fees.Single(x => x.Type == "InsuranceFee").Amount > 0);
         }
 
         [TestMethod]

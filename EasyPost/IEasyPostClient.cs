@@ -483,10 +483,12 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">The id of the shipment to buy the label for</param>
         /// <param name="rateId">The id of the rate to purchase the shipment with.</param>
+        /// <param name="insuranceValue">The value to insure the shipment for.</param>
         /// <returns>Shipment instance.</returns>
         Task<Shipment> BuyShipment(
             string id,
-            string rateId);
+            string rateId,
+            double? insuranceValue = null);
 
         /// <summary>
         /// Buy insurance for a shipment for the given amount.
