@@ -61,7 +61,7 @@ namespace EasyPost
         /// <param name="type">Type of report, e.g. shipment, tracker, payment_log, etc.</param>
         /// <param name="id">String representing a report.</param>
         /// <returns>Report instance.</returns>
-        public async Task<Report> GetReport(
+        public Task<Report> GetReport(
             string type,
             string id)
         {
@@ -69,7 +69,7 @@ namespace EasyPost
             request.AddUrlSegment("id", id);
             request.AddUrlSegment("type", type);
 
-            return await Execute<Report>(request);
+            return Execute<Report>(request);
         }
 
         /// <summary>
@@ -82,17 +82,19 @@ namespace EasyPost
         /// . IncludeChildren
         /// All invalid keys will be ignored. </param>
         /// <returns>Report instance.</returns>
-        public async Task<Report> CreateReport(
+        public Task<Report> CreateReport(
             string type,
             Report report = null)
         {
             var request = new EasyPostRequest("reports/{type}", Method.POST);
             request.AddUrlSegment("type", type);
-            if (report != null) {
+
+            if (report != null)
+            {
                 request.AddQueryString(report.AsDictionary());
             }
 
-            return await Execute<Report>(request);
+            return Execute<Report>(request);
         }
 
         /// <summary>
@@ -107,7 +109,8 @@ namespace EasyPost
         {
             var request = new EasyPostRequest("reports/{type}");
             request.AddUrlSegment("type", type);
-            if (options != null) {
+            if (options != null)
+            {
                 request.AddQueryString(options.AsDictionary());
             }
 
