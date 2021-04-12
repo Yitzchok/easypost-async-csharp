@@ -147,13 +147,23 @@ namespace EasyPostTest
         }
 
         [TestMethod]
-        public void TestAddQueryStringWithDataTimeShouldFormatToISO8601Format()
+        public void TestAddQueryStringWithDateTimeShouldFormatToISO8601Format()
         {
             var date = DateTime.UtcNow;
          
             var parameter = AddQueryStringAndGetProcessedValue(date);
             
             Assert.AreEqual(date.ToString("u"), parameter.Value);
+        }
+
+        [TestMethod]
+        public void TestAddQueryStringWithOnlyDatePartOfDateTimeShouldOnlyIncludeDate()
+        {
+            var date = DateTime.UtcNow.Date;
+         
+            var parameter = AddQueryStringAndGetProcessedValue(date);
+            
+            Assert.AreEqual(date.ToString("yyyy-MM-dd"), parameter.Value);
         }
 
         private Parameter AddQueryStringAndGetProcessedValue(
