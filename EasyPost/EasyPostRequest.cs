@@ -83,7 +83,10 @@ namespace EasyPost
         {
             switch (value) {
                 case DateTime date:
-                    return date.ToString("u");
+                    if(date.TimeOfDay == TimeSpan.Zero)
+                        return date.ToString("yyyy-MM-dd");
+                    else
+                        return date.ToString("u");
                 default:
                     return Convert.ToString(value);
             }

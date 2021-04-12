@@ -120,6 +120,44 @@ namespace EasyPostTest
         }
 
         [TestMethod]
+        public async Task TestPostageZpl()
+        {
+            _testShipment.Options.LabelFormat = "zpl";
+            
+            Shipment shipment = await BuyShipment();
+
+            Assert.IsNotNull(shipment.PostageLabel.LabelUrl);
+            Assert.IsNotNull(shipment.PostageLabel.LabelZplUrl);
+            Assert.AreEqual(shipment.PostageLabel.LabelType, "default");
+            Assert.IsNull(shipment.PostageLabel.LabelFile);
+            Assert.AreEqual(shipment.PostageLabel.LabelFileType, "application/zpl");
+        }
+
+        [TestMethod]
+        public async Task TestPostagePdf()
+        {
+            _testShipment.Options.LabelFormat = "pdf";
+            Shipment shipment = await BuyShipment();
+
+            Assert.IsNotNull(shipment.PostageLabel.LabelUrl);
+            Assert.IsNotNull(shipment.PostageLabel.LabelPdfUrl);
+            Assert.AreEqual(shipment.PostageLabel.LabelFileType, "application/pdf");
+            Assert.AreEqual(shipment.PostageLabel.LabelType, "default");
+            Assert.IsNull(shipment.PostageLabel.LabelFile);
+        }
+
+        [TestMethod]
+        public async Task TestPostagePng()
+        {
+            Shipment shipment = await BuyShipment();
+
+            Assert.IsNotNull(shipment.PostageLabel.LabelUrl);
+            Assert.IsNull(shipment.PostageLabel.LabelFileType);
+            Assert.AreEqual(shipment.PostageLabel.LabelType, "default");
+            Assert.IsNull(shipment.PostageLabel.LabelFile);
+        }
+
+        [TestMethod]
         public async Task TestRateErrorMessages()
         {
             var shipment = await _client.CreateShipment(new Shipment
