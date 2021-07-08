@@ -509,7 +509,7 @@ namespace EasyPost
         Task<Shipment> GenerateLabel(
             string id,
             string fileFormat);
-        
+
         /// <summary>
         /// Send a refund request to the carrier the shipment was purchased from.
         /// </summary>
@@ -544,7 +544,7 @@ namespace EasyPost
         /// Get a paginated list of trackers.
         /// </summary>
         /// <param name="options">Options for the pagination function</param>
-        /// <returns>Instance of EasyPost.ShipmentList</returns>
+        /// <returns>Instance of EasyPost.TrackerList</returns>
         Task<TrackerList> ListTrackers(
             TrackerListOptions options = null);
 
@@ -580,6 +580,48 @@ namespace EasyPost
         /// </summary>
         /// <param name="id">ID of the user</param>
         Task DestroyUser(
+            string id);
+
+        #endregion
+
+        #region Webhooks
+
+        /// <summary>
+        /// Retrieve a Webhook from its id.
+        /// </summary>
+        /// <param name="id">String representing a Webhook. Starts with "hook_".</param>
+        /// <returns>Webhook instance.</returns>
+        Task<Webhook> GetWebhook(
+            string id);
+
+        /// <summary>
+        /// Get an unpaginated list of Webhooks.
+        /// </summary>
+        /// <returns>Instance of WebhookList</returns>
+        Task<WebhookList> ListWebhooks();
+
+        /// <summary>
+        /// Creates a new Webhook
+        /// </summary>
+        /// <param name="url">url</param>
+        /// <returns>Webhook instance.</returns>
+        Task<Webhook> CreateWebhook(string url);
+
+        /// <summary>
+        /// Update a Webhook.
+        /// Enables a Webhook that has been disabled.
+        /// </summary>
+        /// <param name="id">String representing a Webhook. Starts with "hook_".</param>
+        /// <returns>Webhook instance.</returns>
+        Task<Webhook> UpdateWebhook(
+            string id);
+
+        /// <summary>
+        /// Delete a Webhook.
+        /// </summary>
+        /// <param name="id">String representing a Webhook. Starts with "hook_".</param>
+        /// <returns>Webhook instance.</returns>
+        Task<Webhook> DeleteWebhook(
             string id);
 
         #endregion
